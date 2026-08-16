@@ -205,18 +205,24 @@ button:hover .button-arrow {
   inset: 0;
   z-index: 120;
   pointer-events: none;
-  background: var(--charcoal);
-  opacity: 0.08;
-  transform: translateY(-100%);
-  animation: route-wipe 520ms cubic-bezier(0.76, 0, 0.24, 1);
+  background:
+    radial-gradient(circle at 50% 34%, rgba(227, 111, 45, 0.12), transparent 34%),
+    rgba(5, 5, 5, 0.28);
+  opacity: 0;
+  animation: route-soft-fade 420ms ease both;
 }
 
-@keyframes route-wipe {
+@keyframes route-soft-fade {
   0% {
-    transform: translateY(0);
+    opacity: 0.18;
+    backdrop-filter: blur(3px);
+  }
+  55% {
+    opacity: 0.1;
   }
   100% {
-    transform: translateY(-100%);
+    opacity: 0;
+    backdrop-filter: blur(0);
   }
 }
 
@@ -3402,37 +3408,64 @@ label small {
   }
 
   .hero h1 {
-    font-size: 4rem;
+    font-size: clamp(2.75rem, 14vw, 3.45rem);
   }
 
   .top-hero {
-    min-height: 92svh;
+    min-height: 100svh;
   }
 
   .top-hero h1 {
-    max-width: 100%;
-    font-size: 3.25rem;
+    max-width: 9ch;
+    font-size: clamp(2.45rem, 11vw, 2.95rem);
+    line-height: 0.94;
   }
 
   .top-hero__content {
-    min-height: 92svh;
-    padding-bottom: 7rem;
+    min-height: 100svh;
+    align-content: start;
+    padding-top: 7rem;
+    padding-bottom: 2rem;
+  }
+
+  .top-hero__video {
+    object-position: 58% center;
+    transform: none;
   }
 
   .top-hero__copy > p:not(.kicker) {
-    max-width: 24rem;
-    font-size: 0.98rem;
+    max-width: 22rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  .top-hero__actions,
+  .hero__actions {
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-top: 1.35rem;
+  }
+
+  .top-hero__actions a,
+  .hero__actions a {
+    width: min(100%, 20rem);
+    justify-content: space-between;
+    padding-inline: 1rem;
   }
 
   .top-hero__specs {
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr;
     justify-content: flex-start;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 0.2rem;
+    overflow: visible;
+    margin-top: 2rem;
+    padding-bottom: 0;
   }
 
   .top-hero__specs span {
-    flex: 0 0 auto;
+    width: 100%;
+    padding: 0.62rem 0.75rem;
   }
 
   .material-lab {
@@ -3518,13 +3551,25 @@ label small {
     min-height: 100svh;
   }
 
+  .hero__video {
+    object-position: 58% center;
+    transform: none;
+  }
+
+  .hero__shade {
+    background:
+      linear-gradient(180deg, rgba(5, 5, 5, 0.2), rgba(5, 5, 5, 0.44) 34%, rgba(5, 5, 5, 0.88) 100%),
+      linear-gradient(90deg, rgba(5, 5, 5, 0.76), rgba(5, 5, 5, 0.24));
+  }
+
   .hero__content {
     min-height: 100svh;
-    padding-bottom: 7rem;
+    padding-top: 7.25rem;
+    padding-bottom: 5.25rem;
   }
 
   .hero__stage-wrap {
-    min-height: 24rem;
+    min-height: 20rem;
   }
 
   .hero__rail {
@@ -3539,33 +3584,49 @@ label small {
       radial-gradient(circle at 50% 38%, transparent 0 28%, rgba(0, 0, 0, 0.34) 100%);
   }
 
+  .scroll-video-story {
+    min-height: 92svh;
+  }
+
+  .scroll-video-story__video {
+    object-position: 56% center;
+  }
+
+  .scroll-video-story--hot-food .scroll-video-story__video {
+    object-position: 48% center;
+  }
+
   .scroll-video-story__grain {
     opacity: 0.07;
   }
 
   .scroll-video-story__copy,
   .scroll-video-story--right .scroll-video-story__copy {
-    bottom: 5.25rem;
+    top: 52%;
+    right: auto;
+    bottom: auto;
     left: 1.25rem;
     width: calc(100% - 2.5rem);
+    transform: translateY(-50%);
   }
 
   .scroll-video-story__stage-wrap {
-    min-height: 17rem;
+    min-height: 17.5rem;
   }
 
   .scroll-video-story__stage h2 {
     max-width: 10ch;
-    font-size: clamp(2.65rem, 14vw, 4.5rem);
+    font-size: clamp(2.05rem, 10vw, 3.05rem);
   }
 
   .scroll-video-story__body {
-    max-width: 22rem;
-    font-size: 0.98rem;
+    max-width: 21rem;
+    font-size: 0.92rem;
+    line-height: 1.52;
   }
 
   .scroll-video-story__meta {
-    margin-top: 0.95rem;
+    margin-top: 0.75rem;
   }
 
   .scroll-video-story__hint {

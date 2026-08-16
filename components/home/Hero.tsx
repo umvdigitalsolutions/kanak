@@ -68,6 +68,7 @@ export function Hero() {
 
       const { gsap, ScrollTrigger } = ensureGsap();
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const prefersStaticMobile = window.matchMedia("(max-width: 767px)").matches;
       const stageElements = stageRefs.current.filter(Boolean) as HTMLDivElement[];
       const getStageParts = (stageElement: HTMLDivElement) =>
         Array.from(stageElement.querySelectorAll<HTMLElement>("[data-hero-part]"));
@@ -77,6 +78,7 @@ export function Hero() {
       let loadedMetadataCleanup: (() => void) | null = null;
       let unlockCleanup: (() => void) | null = null;
       let playCleanup: (() => void) | null = null;
+      let mobilePlaybackCleanup: (() => void) | null = null;
       let scrubDuration = 0;
       let allowBriefPlayback = false;
       const playhead = { progress: 0 };
@@ -116,7 +118,7 @@ export function Hero() {
         }
 
         stageElements.forEach((stage, index) => {
-          if (index !== stageIndex) {
+          if (index !== stageIndex && index !== previousIndex) {
             const parts = getStageParts(stage);
             gsap.set(stage, { autoAlpha: 0 });
             gsap.set(parts, { autoAlpha: 0, filter: "blur(0px)", y: 0 });
@@ -184,8 +186,43 @@ export function Hero() {
       const setupScrollScrub = () => {
         scrubDuration = Number.isFinite(video.duration) ? Math.max(0, video.duration - 0.12) : 0;
         video.muted = true;
+        video.defaultMuted = true;
         video.pause();
         activeStageRef.current = -1;
+
+        if (prefersStaticMobile) {
+          video.autoplay = true;
+          video.loop = true;
+          activateStage(0, true);
+          const playWhenVisible = () => {
+            if (document.visibilityState !== "visible") return;
+            void video.play().catch(() => {
+              video.currentTime = 0.001;
+            });
+          };
+
+          const observer = new IntersectionObserver(
+            ([entry]) => {
+              if (entry && entry.intersectionRatio > 0) {
+                playWhenVisible();
+              } else {
+                video.pause();
+              }
+            },
+            { rootMargin: "140px 0px", threshold: 0 },
+          );
+
+          observer.observe(section);
+          playWhenVisible();
+          mobilePlaybackCleanup = () => {
+            observer.disconnect();
+            video.pause();
+          };
+          return;
+        }
+
+        video.autoplay = false;
+        video.loop = false;
 
         if (!scrubDuration || prefersReducedMotion) {
           activateStage(0, true);
@@ -235,7 +272,7 @@ export function Hero() {
       };
 
       const pauseUnexpectedPlayback = () => {
-        if (!allowBriefPlayback) {
+        if (!allowBriefPlayback && !prefersStaticMobile) {
           window.requestAnimationFrame(() => video.pause());
         }
       };
@@ -269,13 +306,16 @@ export function Hero() {
         }
       };
 
-      window.addEventListener("pointerdown", unlockSeeking, { once: true, passive: true });
-      unlockCleanup = () => window.removeEventListener("pointerdown", unlockSeeking);
+      if (!prefersStaticMobile) {
+        window.addEventListener("pointerdown", unlockSeeking, { once: true, passive: true });
+        unlockCleanup = () => window.removeEventListener("pointerdown", unlockSeeking);
+      }
 
       return () => {
         loadedMetadataCleanup?.();
         unlockCleanup?.();
         playCleanup?.();
+        mobilePlaybackCleanup?.();
         scrollTrigger?.kill();
         scrubTween?.kill();
         section.classList.remove("is-pin-complete");
