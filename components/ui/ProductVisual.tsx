@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { assetPath } from "@/lib/assets";
 import type { ContainerColor, ContainerShape } from "@/data/products";
 
 type ProductVisualProps = {
@@ -24,7 +25,7 @@ export function ProductVisual({
   className,
 }: ProductVisualProps) {
   const hasSourceImage = Boolean(image);
-  const imageSrc = image ?? "/images/generated/cinematic-noodle-container.png";
+  const imageSrc = image ?? assetPath("/images/generated/cinematic-noodle-container.png");
   const labels = [
     shape,
     baseColor === "custom" ? "custom finish" : `${baseColor} base`,

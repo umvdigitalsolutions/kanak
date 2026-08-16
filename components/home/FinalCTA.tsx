@@ -1,6 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { ProductVisual } from "@/components/ui/ProductVisual";
+import { assetPath } from "@/lib/assets";
 
 export function FinalCTA() {
   return (
@@ -33,7 +34,7 @@ export function FinalCTA() {
           alt="Rectangle Container - Black"
           baseColor="black"
           compartments={1}
-          image="/images/products/kanak/rectangle-container-black.png"
+          image={assetPath("/images/products/kanak/rectangle-container-black.png")}
           shape="rectangular"
         />
       </Container>

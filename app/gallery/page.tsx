@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { products } from "@/data/products";
+import { assetPath } from "@/lib/assets";
 import { Container } from "@/components/ui/Container";
 
 export const metadata: Metadata = {
@@ -11,32 +12,32 @@ export const metadata: Metadata = {
 
 const manufacturingItems = [
   {
-    src: "/images/generated/flow/01-material.jpg",
+    src: assetPath("/images/generated/flow/01-material.jpg"),
     title: "Material Preparation",
     description: "Plastic resin and biodegradable material direction visualized before forming.",
   },
   {
-    src: "/images/generated/flow/02-forming.jpg",
+    src: assetPath("/images/generated/flow/02-forming.jpg"),
     title: "Container Forming",
     description: "Rigid container shapes formed for food-service handling and consistent presentation.",
   },
   {
-    src: "/images/generated/flow/03-trimming.jpg",
+    src: assetPath("/images/generated/flow/03-trimming.jpg"),
     title: "Rim Trimming",
     description: "Clean rim geometry supports practical lid alignment and stacked movement.",
   },
   {
-    src: "/images/generated/flow/04-lid-fit.jpg",
+    src: assetPath("/images/generated/flow/04-lid-fit.jpg"),
     title: "Lid Fit Check",
     description: "Matching lid direction is checked around the rim before packing decisions.",
   },
   {
-    src: "/images/generated/flow/05-quality.jpg",
+    src: assetPath("/images/generated/flow/05-quality.jpg"),
     title: "Quality Review",
     description: "Shape, finish and batch presentation are reviewed before product movement.",
   },
   {
-    src: "/images/generated/flow/06-packing.jpg",
+    src: assetPath("/images/generated/flow/06-packing.jpg"),
     title: "Packing Ready",
     description: "Nested stacks are prepared for clean dispatch and food-service supply.",
   },

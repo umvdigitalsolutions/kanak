@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { assetPath } from "@/lib/assets";
 
-const productImage = "/images/generated/cinematic-noodle-container.png";
+const productImage = assetPath("/images/generated/cinematic-noodle-container.png");
 
 type ProductPhotoSceneProps = {
   alt?: string;

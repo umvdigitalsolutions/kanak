@@ -6,6 +6,7 @@ import { ProductTypes } from "@/components/home/ProductTypes";
 import { ColorSwitcher } from "@/components/home/ColorSwitcher";
 import { DeliveryJourney } from "@/components/home/DeliveryJourney";
 import { FinalCTA } from "@/components/home/FinalCTA";
+import { assetPath } from "@/lib/assets";
 
 const hotFoodVideoStages: ScrollVideoStage[] = [
   {
@@ -60,7 +61,7 @@ export default function Home() {
         scrollDistance={6500}
         stages={hotFoodVideoStages}
         textPosition="left"
-        videoSrc="/videos/noodles-scrub.mp4"
+        videoSrc={assetPath("/videos/noodles-scrub.mp4")}
       />
       <KitchenToCustomer />
       <ProductTypes />

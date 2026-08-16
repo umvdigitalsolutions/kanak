@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { Component, Disc3, Layers3, PackageCheck, ScanLine, Scissors } from "lucide-react";
 import { ensureGsap } from "@/lib/animations";
+import { assetPath } from "@/lib/assets";
 import { Container } from "@/components/ui/Container";
 
 /**
@@ -16,7 +17,7 @@ const stages = [
   {
     glyph: Layers3,
     id: "material",
-    image: "/images/generated/flow/01-material.jpg",
+    image: assetPath("/images/generated/flow/01-material.jpg"),
     label: "Material",
     tag: "Stock check",
     body: "Material stock is selected against the order specification before production starts.",
@@ -24,7 +25,7 @@ const stages = [
   {
     glyph: Component,
     id: "forming",
-    image: "/images/generated/flow/02-forming.jpg",
+    image: assetPath("/images/generated/flow/02-forming.jpg"),
     label: "Forming",
     tag: "Tooling",
     body: "Container geometry is formed to the agreed profile, holding wall and draft.",
@@ -32,7 +33,7 @@ const stages = [
   {
     glyph: Scissors,
     id: "trimming",
-    image: "/images/generated/flow/03-trimming.jpg",
+    image: assetPath("/images/generated/flow/03-trimming.jpg"),
     label: "Trimming",
     tag: "Rim line",
     body: "Formed parts are trimmed so the rim line stays consistent across the run.",
@@ -40,7 +41,7 @@ const stages = [
   {
     glyph: Disc3,
     id: "lid-fit",
-    image: "/images/generated/flow/04-lid-fit.jpg",
+    image: assetPath("/images/generated/flow/04-lid-fit.jpg"),
     label: "Lid fit",
     tag: "Closure",
     body: "Base and lid are matched so closure behaves the same from first part to last.",
@@ -48,7 +49,7 @@ const stages = [
   {
     glyph: ScanLine,
     id: "quality",
-    image: "/images/generated/flow/05-quality.jpg",
+    image: assetPath("/images/generated/flow/05-quality.jpg"),
     label: "Quality check",
     tag: "Inspection",
     body: "Parts are checked for form, rim finish and stacking behaviour before they move on.",
@@ -56,7 +57,7 @@ const stages = [
   {
     glyph: PackageCheck,
     id: "packing",
-    image: "/images/generated/flow/06-packing.jpg",
+    image: assetPath("/images/generated/flow/06-packing.jpg"),
     label: "Packing",
     tag: "Bulk supply",
     body: "Counted, stacked and packed for bulk supply and dispatch.",

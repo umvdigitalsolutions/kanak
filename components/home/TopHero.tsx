@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import { assetPath } from "@/lib/assets";
 
 const heroSpecs = ["Food-grade material focus", "Secure lid-fit range", "Bulk supply for food service"];
 
@@ -13,10 +14,10 @@ export function TopHero() {
         loop
         muted
         playsInline
-        poster="/images/hero/hero-container-fallback.png"
+        poster={assetPath("/images/hero/hero-container-fallback.png")}
         preload="metadata"
       >
-        <source src="/videos/containers.mp4" type="video/mp4" />
+        <source src={assetPath("/videos/containers.mp4")} type="video/mp4" />
       </video>
       <div className="top-hero__shade" aria-hidden="true" />
       <div className="top-hero__content">

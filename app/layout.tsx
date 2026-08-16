@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manrope, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { company } from "@/data/company";
+import { assetPath } from "@/lib/assets";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { RouteTransition } from "@/components/animation/RouteTransition";
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     title: "Takeaway Food Containers | Food Packaging Manufacturer",
     description:
       "Explore Kanak Mouldings round, rectangular, black, white and transparent food packaging containers.",
-    images: ["/images/generated/cinematic-noodle-container.png"],
+    images: [assetPath("/images/generated/cinematic-noodle-container.png")],
     siteName: "Kanak Mouldings",
     type: "website",
   },

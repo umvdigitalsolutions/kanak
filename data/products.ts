@@ -1,3 +1,5 @@
+import { assetPath } from "@/lib/assets";
+
 export type ContainerShape = "rectangular" | "round" | "square" | "tray";
 export type ContainerColor = "black" | "white" | "clear" | "custom";
 
@@ -69,8 +71,8 @@ export const products: Product[] = [
       "Protective packing for shipping and handling",
     ],
     customisation: "Capacity, lid fit and packing quantity can be confirmed during quotation.",
-    image: "/images/products/kanak/round-container-black.png",
-    gallery: ["/images/products/kanak/round-container-black.png"],
+    image: assetPath("/images/products/kanak/round-container-black.png"),
+    gallery: [assetPath("/images/products/kanak/round-container-black.png")],
     featured: true,
     placeholderSpecification: true,
     visual: { baseColor: "black", compartments: 1, lid: true, accent: "curry" },
@@ -100,8 +102,8 @@ export const products: Product[] = [
       "Protective packing for shipping and handling",
     ],
     customisation: "Capacity, lid fit and packing quantity can be confirmed during quotation.",
-    image: "/images/products/kanak/round-container-white.png",
-    gallery: ["/images/products/kanak/round-container-white.png"],
+    image: assetPath("/images/products/kanak/round-container-white.png"),
+    gallery: [assetPath("/images/products/kanak/round-container-white.png")],
     featured: true,
     placeholderSpecification: true,
     visual: { baseColor: "white", compartments: 1, lid: true, accent: "dessert" },
@@ -131,8 +133,8 @@ export const products: Product[] = [
       "Protective packing for shipping and handling",
     ],
     customisation: "Capacity, lid fit and packing quantity can be confirmed during quotation.",
-    image: "/images/products/kanak/rectangle-container-transparent.png",
-    gallery: ["/images/products/kanak/rectangle-container-transparent.png"],
+    image: assetPath("/images/products/kanak/rectangle-container-transparent.png"),
+    gallery: [assetPath("/images/products/kanak/rectangle-container-transparent.png")],
     featured: true,
     placeholderSpecification: true,
     visual: { baseColor: "clear", compartments: 1, lid: true, accent: "salad" },
@@ -162,8 +164,8 @@ export const products: Product[] = [
       "Protective packing for shipping and handling",
     ],
     customisation: "Capacity, lid fit and packing quantity can be confirmed during quotation.",
-    image: "/images/products/kanak/rectangle-container-black.png",
-    gallery: ["/images/products/kanak/rectangle-container-black.png"],
+    image: assetPath("/images/products/kanak/rectangle-container-black.png"),
+    gallery: [assetPath("/images/products/kanak/rectangle-container-black.png")],
     featured: true,
     placeholderSpecification: true,
     visual: { baseColor: "black", compartments: 1, lid: true, accent: "empty" },

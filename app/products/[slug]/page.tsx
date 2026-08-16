@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { products, getProductBySlug } from "@/data/products";
+import { assetPath } from "@/lib/assets";
 import { quoteHref } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: product.name,
       description: product.shortDescription,
-      images: [product.image ?? "/images/generated/cinematic-noodle-container.png"],
+      images: [product.image ?? assetPath("/images/generated/cinematic-noodle-container.png")],
     },
   };
 }
@@ -52,7 +53,7 @@ export default async function ProductDetailPage({ params }: Props) {
     name: product.name,
     description: product.description,
     category: product.category,
-    image: product.image ?? "/images/generated/cinematic-noodle-container.png",
+    image: product.image ?? assetPath("/images/generated/cinematic-noodle-container.png"),
   };
 
   return (

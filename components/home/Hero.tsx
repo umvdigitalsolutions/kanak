@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { ensureGsap } from "@/lib/animations";
+import { assetPath } from "@/lib/assets";
 import { MagneticButton } from "@/components/animation/MagneticButton";
 
 const heroStages = [
@@ -294,7 +295,7 @@ export function Hero() {
         preload="auto"
         ref={videoRef}
       >
-        <source src="/videos/box-video-scrub.mp4" type="video/mp4" />
+        <source src={assetPath("/videos/box-video-scrub.mp4")} type="video/mp4" />
       </video>
       <div className="hero__background" aria-hidden="true" />
       <div className="hero__smoke" aria-hidden="true">
