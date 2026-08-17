@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { ensureGsap } from "@/lib/animations";
@@ -68,6 +69,11 @@ export function Hero() {
 
       const { gsap, ScrollTrigger } = ensureGsap();
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      // Phones never scrub. Seeking `currentTime` during scroll is unreliable on
+      // mobile Safari and costs a video download for an effect that stutters, so
+      // small screens keep the poster still and get the copy sequence only.
+      const prefersStaticMobile = window.matchMedia("(max-width: 767px)").matches;
+      const usesVideo = !prefersStaticMobile && !prefersReducedMotion;
       const stageElements = stageRefs.current.filter(Boolean) as HTMLDivElement[];
       const getStageParts = (stageElement: HTMLDivElement) =>
         Array.from(stageElement.querySelectorAll<HTMLElement>("[data-hero-part]"));
@@ -255,10 +261,28 @@ export function Hero() {
         }
       };
 
+      // The copy sequence is driven by scroll on every device; only the video
+      // seeking below is conditional.
+      setupScrollScrub();
+
+      if (!usesVideo) {
+        // Nothing else to wire up: the poster underneath the (empty) video
+        // element is the visual, and it was never asked to download an MP4.
+        section.classList.add("hero--poster");
+
+        return () => {
+          scrollTrigger?.kill();
+          scrubTween?.kill();
+          section.classList.remove("is-pin-complete", "hero--poster");
+        };
+      }
+
       video.addEventListener("play", pauseUnexpectedPlayback);
       playCleanup = () => video.removeEventListener("play", pauseUnexpectedPlayback);
 
-      setupScrollScrub();
+      // Source is attached here rather than in markup so phones and
+      // reduced-motion visitors never fetch the file at all.
+      video.src = assetPath("/videos/box-video-scrub.mp4");
 
       if (video.readyState >= 1) {
         adoptVideoDuration();
@@ -302,17 +326,27 @@ export function Hero() {
 
   return (
     <section className="hero" id="container-story" ref={sectionRef}>
+      {/* Poster sits under the video as the base layer: it is the first frame,
+          so desktop sees no flash before the MP4 paints, and phones and
+          reduced-motion visitors see this alone. */}
+      <Image
+        alt=""
+        aria-hidden="true"
+        className="hero__poster"
+        fill
+        priority
+        sizes="100vw"
+        src={assetPath("/images/hero/hero-container-fallback.png")}
+      />
       <video
         aria-hidden="true"
         className="hero__video"
         disablePictureInPicture
         muted
         playsInline
-        preload="auto"
+        preload="none"
         ref={videoRef}
-      >
-        <source src={assetPath("/videos/box-video-scrub.mp4")} type="video/mp4" />
-      </video>
+      />
       <div className="hero__background" aria-hidden="true" />
       <div className="hero__smoke" aria-hidden="true">
         <span />
