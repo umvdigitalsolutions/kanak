@@ -86,8 +86,6 @@ export function Hero() {
       let scrubDuration = 0;
       let allowBriefPlayback = false;
       const playhead = { progress: 0 };
-      const clearPinComplete = () => section.classList.remove("is-pin-complete");
-      const markPinComplete = () => section.classList.add("is-pin-complete");
 
       const activateStage = (stageIndex: number, immediate = false) => {
         if (stageIndex === activeStageRef.current) return;
@@ -232,13 +230,6 @@ export function Hero() {
           scrub: 1.05,
           anticipatePin: 1,
           invalidateOnRefresh: true,
-          onEnter: clearPinComplete,
-          onEnterBack: clearPinComplete,
-          onLeave: markPinComplete,
-          onLeaveBack: clearPinComplete,
-          onRefresh: (self) => {
-            section.classList.toggle("is-pin-complete", self.progress >= 1 && !self.isActive);
-          },
         });
 
         setScrubProgress(scrollTrigger.progress);
@@ -273,7 +264,7 @@ export function Hero() {
         return () => {
           scrollTrigger?.kill();
           scrubTween?.kill();
-          section.classList.remove("is-pin-complete", "hero--poster");
+          section.classList.remove("hero--poster");
         };
       }
 
@@ -318,7 +309,6 @@ export function Hero() {
         playCleanup?.();
         scrollTrigger?.kill();
         scrubTween?.kill();
-        section.classList.remove("is-pin-complete");
       };
     },
     { scope: sectionRef },

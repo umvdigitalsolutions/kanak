@@ -566,12 +566,6 @@ button:hover .button-arrow {
   color: var(--porcelain);
 }
 
-.hero.is-pin-complete {
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-
 /* Poster is the base layer under the video: the video's own first frame, so
    there is no flash before the MP4 paints and it stands alone on phones. */
 .hero__poster {
