@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { X } from "lucide-react";
+import { useEffect } from "react";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 type MobileMenuProps = {
   open: boolean;
@@ -11,6 +13,19 @@ type MobileMenuProps = {
 };
 
 export function MobileMenu({ ctaLabel = "Contact Us", open, links, onClose }: MobileMenuProps) {
+  useLockBodyScroll(open);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, onClose]);
+
   return (
     <div className={open ? "mobile-menu is-open" : "mobile-menu"} aria-hidden={!open}>
       <button aria-label="Close menu" className="mobile-menu__close" onClick={onClose} type="button">
