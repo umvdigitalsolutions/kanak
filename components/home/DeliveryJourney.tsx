@@ -157,7 +157,7 @@ export function DeliveryJourney() {
       // One pin spanning every stage, so progress reaches 1 at the last step
       // instead of topping out partway through the section.
       ScrollTrigger.create({
-        end: () => `+=${Math.round((window.innerWidth < 768 ? 380 : 560) * COUNT)}`,
+        end: () => `+=${Math.round((window.innerWidth < 768 ? 300 : 400) * COUNT)}`,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           // The six rail fills double as the overall progress bar, filling
