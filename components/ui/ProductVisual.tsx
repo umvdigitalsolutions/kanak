@@ -48,10 +48,9 @@ export function ProductVisual({
       <Image
         alt={alt ?? ""}
         className="product-visual__image"
-        height={1024}
+        fill
         sizes="(max-width: 680px) 85vw, 24rem"
         src={imageSrc}
-        width={1536}
       />
       <span className="product-visual__shine" />
       {hasSourceImage ? null : (

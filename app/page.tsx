@@ -60,7 +60,7 @@ export default function Home() {
       <ScrollVideoStory
         className="scroll-video-story--hot-food"
         objectPosition="center center"
-        scrollDistance={3400}
+        scrollDistance={1800}
         stages={hotFoodVideoStages}
         textPosition="left"
         videoSrc={assetPath("/videos/noodles-scrub.mp4")}

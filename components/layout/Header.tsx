@@ -19,6 +19,9 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  // Only the homepage opens on a dark hero. Every other route starts on the
+  // porcelain background, where porcelain nav text would be invisible.
+  const onLightPage = pathname !== "/";
 
   useEffect(() => {
     const update = () => setScrolled(window.scrollY > 20);
@@ -29,7 +32,15 @@ export function Header() {
 
   return (
     <>
-      <header className={scrolled ? "site-nav is-scrolled" : "site-nav"}>
+      <header
+        className={[
+          "site-nav",
+          scrolled ? "is-scrolled" : "",
+          onLightPage ? "site-nav--light" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         <Link className="site-nav__brand" href="/" aria-label="Kanak Mouldings home">
           <span>Kanak</span>
           <span>Mouldings</span>

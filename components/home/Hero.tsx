@@ -209,11 +209,13 @@ export function Hero() {
         scrollTrigger = ScrollTrigger.create({
           trigger: section,
           start: "top top",
+          // Five stages at roughly 400-560px each: enough travel to read each
+          // beat without the hero eating six viewports of scroll on its own.
           end: () => {
             const width = window.innerWidth;
-            if (width < 768) return "+=3400";
-            if (width < 1180) return "+=4400";
-            return "+=5400";
+            if (width < 768) return "+=2000";
+            if (width < 1180) return "+=2400";
+            return "+=2800";
           },
           animation: scrubTween,
           pin: true,
