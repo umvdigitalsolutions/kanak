@@ -157,19 +157,22 @@ export function Hero() {
       };
 
       const renderScrubFrame = () => {
-        if (!scrubDuration) return;
-
-        if (!video.paused) {
-          video.pause();
-        }
-
         const progress = Math.min(1, Math.max(0, playhead.progress));
-        const safeTime = progress * scrubDuration;
-        if (Number.isFinite(safeTime) && Math.abs(video.currentTime - safeTime) > 0.018) {
-          try {
-            video.currentTime = safeTime;
-          } catch {
-            // Browsers can reject seeks for a moment while the MP4 decoder warms up.
+
+        // The copy sequence runs whether or not the video has arrived, so a slow
+        // MP4 never leaves the pinned section blank.
+        if (scrubDuration) {
+          if (!video.paused) {
+            video.pause();
+          }
+
+          const safeTime = progress * scrubDuration;
+          if (Number.isFinite(safeTime) && Math.abs(video.currentTime - safeTime) > 0.018) {
+            try {
+              video.currentTime = safeTime;
+            } catch {
+              // Browsers can reject seeks for a moment while the MP4 decoder warms up.
+            }
           }
         }
 
@@ -181,19 +184,19 @@ export function Hero() {
         renderScrubFrame();
       };
 
+      // The pin is built at mount, never on the video's schedule. Creating it
+      // from a late `loadedmetadata` (these MP4s are multi-megabyte) measured
+      // the trigger against a page the visitor had already scrolled, which left
+      // the section pinned on top of the one after it.
       const setupScrollScrub = () => {
-        scrubDuration = Number.isFinite(video.duration) ? Math.max(0, video.duration - 0.12) : 0;
-        video.muted = true;
-        video.pause();
         activeStageRef.current = -1;
 
-        if (!scrubDuration || prefersReducedMotion) {
+        if (prefersReducedMotion) {
           activateStage(0, true);
           return;
         }
 
         playhead.progress = 0;
-        video.currentTime = 0.001;
         activateStage(0, true);
 
         scrollTrigger?.kill();
@@ -232,8 +235,18 @@ export function Hero() {
           },
         });
 
-        ScrollTrigger.refresh();
         setScrubProgress(scrollTrigger.progress);
+      };
+
+      // Whenever the video's duration becomes known, adopt it and repaint the
+      // frame for wherever the visitor currently is.
+      const adoptVideoDuration = () => {
+        scrubDuration = Number.isFinite(video.duration) ? Math.max(0, video.duration - 0.12) : 0;
+        if (!scrubDuration || prefersReducedMotion) return;
+
+        video.muted = true;
+        video.pause();
+        setScrubProgress(scrollTrigger?.progress ?? playhead.progress);
       };
 
       const pauseUnexpectedPlayback = () => {
@@ -245,12 +258,13 @@ export function Hero() {
       video.addEventListener("play", pauseUnexpectedPlayback);
       playCleanup = () => video.removeEventListener("play", pauseUnexpectedPlayback);
 
+      setupScrollScrub();
+
       if (video.readyState >= 1) {
-        setupScrollScrub();
+        adoptVideoDuration();
       } else {
-        const onLoadedMetadata = () => setupScrollScrub();
-        video.addEventListener("loadedmetadata", onLoadedMetadata, { once: true });
-        loadedMetadataCleanup = () => video.removeEventListener("loadedmetadata", onLoadedMetadata);
+        video.addEventListener("loadedmetadata", adoptVideoDuration, { once: true });
+        loadedMetadataCleanup = () => video.removeEventListener("loadedmetadata", adoptVideoDuration);
         video.load();
       }
 
