@@ -12,7 +12,6 @@ type ProductPhotoSceneProps = {
   eyebrow?: string;
   smoke?: boolean;
   tone?: "black" | "white" | "clear" | "custom" | "warm";
-  variant?: "default" | "stack" | "lid" | "exploded" | "configurator";
 };
 
 export function ProductPhotoScene({
@@ -23,23 +22,16 @@ export function ProductPhotoScene({
   eyebrow,
   smoke = false,
   tone = "warm",
-  variant = "default",
 }: ProductPhotoSceneProps) {
   return (
     <figure
-      className={cn(
-        "product-photo-scene",
-        `product-photo-scene--${variant}`,
-        `product-photo-scene--tone-${tone}`,
-        className,
-      )}
+      className={cn("product-photo-scene", `product-photo-scene--tone-${tone}`, className)}
     >
       <div className="product-photo-scene__media">
         <Image
           alt={alt}
           className="product-photo-scene__image"
           height={1024}
-          priority={variant === "default"}
           sizes="(max-width: 980px) 100vw, 48vw"
           src={productImage}
           width={1536}

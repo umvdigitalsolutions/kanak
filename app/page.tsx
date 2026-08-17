@@ -55,16 +55,16 @@ export default function Home() {
     <>
       <TopHero />
       <Hero />
+      <KitchenToCustomer />
+      <ProductTypes />
       <ScrollVideoStory
         className="scroll-video-story--hot-food"
         objectPosition="center center"
-        scrollDistance={6500}
+        scrollDistance={3400}
         stages={hotFoodVideoStages}
         textPosition="left"
         videoSrc={assetPath("/videos/noodles-scrub.mp4")}
       />
-      <KitchenToCustomer />
-      <ProductTypes />
       <ColorSwitcher />
       <DeliveryJourney />
       <FinalCTA />

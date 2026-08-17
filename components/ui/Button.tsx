@@ -10,6 +10,7 @@ type ButtonProps = {
   icon?: React.ReactNode;
   type?: "button" | "submit";
   onClick?: () => void;
+  disabled?: boolean;
 };
 
 const variants = {
@@ -28,6 +29,7 @@ export function Button({
   icon,
   type = "button",
   onClick,
+  disabled = false,
 }: ButtonProps) {
   const content = (
     <>
@@ -39,7 +41,7 @@ export function Button({
   );
 
   const classes = cn(
-    "group inline-flex min-h-11 items-center justify-center gap-3 border px-5 py-3 text-xs font-semibold uppercase transition duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember",
+    "group inline-flex min-h-11 items-center justify-center gap-3 border px-5 py-3 text-xs font-semibold uppercase transition duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember disabled:cursor-not-allowed disabled:opacity-55",
     variants[variant],
     className,
   );
@@ -53,7 +55,7 @@ export function Button({
   }
 
   return (
-    <button className={classes} onClick={onClick} type={type}>
+    <button className={classes} disabled={disabled} onClick={onClick} type={type}>
       {content}
     </button>
   );
