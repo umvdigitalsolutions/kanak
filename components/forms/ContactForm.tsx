@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { products } from "@/data/products";
 import { Button } from "@/components/ui/Button";
+import { submitQuoteRequest } from "@/app/contact/actions";
 
 export type ContactInitialValues = {
   product?: string;
@@ -59,8 +60,11 @@ function initialForm(values: ContactInitialValues): FormState {
 
 export function ContactForm({ initialValues }: { initialValues: ContactInitialValues }) {
   const [form, setForm] = useState<FormState>(() => initialForm(initialValues));
+  const [website, setWebsite] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const selectedProduct = useMemo(
     () => products.find((product) => product.name === form.containerType),
@@ -88,12 +92,38 @@ export function ContactForm({ initialValues }: { initialValues: ContactInitialVa
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
+        if (isPending) return;
+
         setSubmitted(false);
-        if (validate()) {
-          setSubmitted(true);
-        }
+        setSubmitError(null);
+        if (!validate()) return;
+
+        startTransition(async () => {
+          const result = await submitQuoteRequest({ ...form, website });
+
+          if (result.ok) {
+            setSubmitted(true);
+            setErrors({});
+          } else {
+            setSubmitError(result.error);
+            if (result.fieldErrors) setErrors(result.fieldErrors);
+          }
+        });
       }}
     >
+      <div aria-hidden="true" className="quote-form__honeypot">
+        <label htmlFor="website">Website</label>
+        <input
+          autoComplete="off"
+          id="website"
+          name="website"
+          onChange={(event) => setWebsite(event.target.value)}
+          tabIndex={-1}
+          type="text"
+          value={website}
+        />
+      </div>
+
       <div className="form-grid">
         <label>
           Name
@@ -208,14 +238,20 @@ export function ContactForm({ initialValues }: { initialValues: ContactInitialVa
         <p className="form-note">Product specifications on this site are placeholders until verified by the manufacturer.</p>
       ) : null}
 
-      {submitted ? (
-        <div className="demo-submit" role="status">
-          Quote request prepared in frontend demo mode. Connect an API or email service before treating this as delivered.
+      {submitError ? (
+        <div className="form-error" role="alert">
+          {submitError}
         </div>
       ) : null}
 
-      <Button type="submit" variant="accent">
-        Request Quote
+      {submitted ? (
+        <div className="demo-submit" role="status">
+          Quote request received. Our team will follow up using the phone or email you provided.
+        </div>
+      ) : null}
+
+      <Button disabled={isPending} type="submit" variant="accent">
+        {isPending ? "Sending..." : "Request Quote"}
       </Button>
     </form>
   );
