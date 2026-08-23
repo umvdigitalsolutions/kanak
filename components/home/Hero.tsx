@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { ensureGsap } from "@/lib/animations";
@@ -68,7 +69,11 @@ export function Hero() {
 
       const { gsap, ScrollTrigger } = ensureGsap();
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      // Phones never scrub. Seeking `currentTime` during scroll is unreliable on
+      // mobile Safari and costs a video download for an effect that stutters, so
+      // small screens keep the poster still and get the copy sequence only.
       const prefersStaticMobile = window.matchMedia("(max-width: 767px)").matches;
+      const usesVideo = !prefersStaticMobile && !prefersReducedMotion;
       const stageElements = stageRefs.current.filter(Boolean) as HTMLDivElement[];
       const getStageParts = (stageElement: HTMLDivElement) =>
         Array.from(stageElement.querySelectorAll<HTMLElement>("[data-hero-part]"));
@@ -78,12 +83,9 @@ export function Hero() {
       let loadedMetadataCleanup: (() => void) | null = null;
       let unlockCleanup: (() => void) | null = null;
       let playCleanup: (() => void) | null = null;
-      let mobilePlaybackCleanup: (() => void) | null = null;
       let scrubDuration = 0;
       let allowBriefPlayback = false;
       const playhead = { progress: 0 };
-      const clearPinComplete = () => section.classList.remove("is-pin-complete");
-      const markPinComplete = () => section.classList.add("is-pin-complete");
 
       const activateStage = (stageIndex: number, immediate = false) => {
         if (stageIndex === activeStageRef.current) return;
@@ -118,7 +120,7 @@ export function Hero() {
         }
 
         stageElements.forEach((stage, index) => {
-          if (index !== stageIndex && index !== previousIndex) {
+          if (index !== stageIndex) {
             const parts = getStageParts(stage);
             gsap.set(stage, { autoAlpha: 0 });
             gsap.set(parts, { autoAlpha: 0, filter: "blur(0px)", y: 0 });
@@ -159,19 +161,22 @@ export function Hero() {
       };
 
       const renderScrubFrame = () => {
-        if (!scrubDuration) return;
-
-        if (!video.paused) {
-          video.pause();
-        }
-
         const progress = Math.min(1, Math.max(0, playhead.progress));
-        const safeTime = progress * scrubDuration;
-        if (Number.isFinite(safeTime) && Math.abs(video.currentTime - safeTime) > 0.018) {
-          try {
-            video.currentTime = safeTime;
-          } catch {
-            // Browsers can reject seeks for a moment while the MP4 decoder warms up.
+
+        // The copy sequence runs whether or not the video has arrived, so a slow
+        // MP4 never leaves the pinned section blank.
+        if (scrubDuration) {
+          if (!video.paused) {
+            video.pause();
+          }
+
+          const safeTime = progress * scrubDuration;
+          if (Number.isFinite(safeTime) && Math.abs(video.currentTime - safeTime) > 0.018) {
+            try {
+              video.currentTime = safeTime;
+            } catch {
+              // Browsers can reject seeks for a moment while the MP4 decoder warms up.
+            }
           }
         }
 
@@ -183,54 +188,19 @@ export function Hero() {
         renderScrubFrame();
       };
 
+      // The pin is built at mount, never on the video's schedule. Creating it
+      // from a late `loadedmetadata` (these MP4s are multi-megabyte) measured
+      // the trigger against a page the visitor had already scrolled, which left
+      // the section pinned on top of the one after it.
       const setupScrollScrub = () => {
-        scrubDuration = Number.isFinite(video.duration) ? Math.max(0, video.duration - 0.12) : 0;
-        video.muted = true;
-        video.defaultMuted = true;
-        video.pause();
         activeStageRef.current = -1;
 
-        if (prefersStaticMobile) {
-          video.autoplay = true;
-          video.loop = true;
-          activateStage(0, true);
-          const playWhenVisible = () => {
-            if (document.visibilityState !== "visible") return;
-            void video.play().catch(() => {
-              video.currentTime = 0.001;
-            });
-          };
-
-          const observer = new IntersectionObserver(
-            ([entry]) => {
-              if (entry && entry.intersectionRatio > 0) {
-                playWhenVisible();
-              } else {
-                video.pause();
-              }
-            },
-            { rootMargin: "140px 0px", threshold: 0 },
-          );
-
-          observer.observe(section);
-          playWhenVisible();
-          mobilePlaybackCleanup = () => {
-            observer.disconnect();
-            video.pause();
-          };
-          return;
-        }
-
-        video.autoplay = false;
-        video.loop = false;
-
-        if (!scrubDuration || prefersReducedMotion) {
+        if (prefersReducedMotion) {
           activateStage(0, true);
           return;
         }
 
         playhead.progress = 0;
-        video.currentTime = 0.001;
         activateStage(0, true);
 
         scrollTrigger?.kill();
@@ -246,11 +216,13 @@ export function Hero() {
         scrollTrigger = ScrollTrigger.create({
           trigger: section,
           start: "top top",
+          // Five stages at roughly 400-560px each: enough travel to read each
+          // beat without the hero eating six viewports of scroll on its own.
           end: () => {
             const width = window.innerWidth;
-            if (width < 768) return "+=4200";
-            if (width < 1180) return "+=5400";
-            return "+=6800";
+            if (width < 768) return "+=2000";
+            if (width < 1180) return "+=2400";
+            return "+=2800";
           },
           animation: scrubTween,
           pin: true,
@@ -258,34 +230,56 @@ export function Hero() {
           scrub: 1.05,
           anticipatePin: 1,
           invalidateOnRefresh: true,
-          onEnter: clearPinComplete,
-          onEnterBack: clearPinComplete,
-          onLeave: markPinComplete,
-          onLeaveBack: clearPinComplete,
-          onRefresh: (self) => {
-            section.classList.toggle("is-pin-complete", self.progress >= 1 && !self.isActive);
-          },
         });
 
-        ScrollTrigger.refresh();
         setScrubProgress(scrollTrigger.progress);
       };
 
+      // Whenever the video's duration becomes known, adopt it and repaint the
+      // frame for wherever the visitor currently is.
+      const adoptVideoDuration = () => {
+        scrubDuration = Number.isFinite(video.duration) ? Math.max(0, video.duration - 0.12) : 0;
+        if (!scrubDuration || prefersReducedMotion) return;
+
+        video.muted = true;
+        video.pause();
+        setScrubProgress(scrollTrigger?.progress ?? playhead.progress);
+      };
+
       const pauseUnexpectedPlayback = () => {
-        if (!allowBriefPlayback && !prefersStaticMobile) {
+        if (!allowBriefPlayback) {
           window.requestAnimationFrame(() => video.pause());
         }
       };
 
+      // The copy sequence is driven by scroll on every device; only the video
+      // seeking below is conditional.
+      setupScrollScrub();
+
+      if (!usesVideo) {
+        // Nothing else to wire up: the poster underneath the (empty) video
+        // element is the visual, and it was never asked to download an MP4.
+        section.classList.add("hero--poster");
+
+        return () => {
+          scrollTrigger?.kill();
+          scrubTween?.kill();
+          section.classList.remove("hero--poster");
+        };
+      }
+
       video.addEventListener("play", pauseUnexpectedPlayback);
       playCleanup = () => video.removeEventListener("play", pauseUnexpectedPlayback);
 
+      // Source is attached here rather than in markup so phones and
+      // reduced-motion visitors never fetch the file at all.
+      video.src = assetPath("/videos/box-video-scrub.mp4");
+
       if (video.readyState >= 1) {
-        setupScrollScrub();
+        adoptVideoDuration();
       } else {
-        const onLoadedMetadata = () => setupScrollScrub();
-        video.addEventListener("loadedmetadata", onLoadedMetadata, { once: true });
-        loadedMetadataCleanup = () => video.removeEventListener("loadedmetadata", onLoadedMetadata);
+        video.addEventListener("loadedmetadata", adoptVideoDuration, { once: true });
+        loadedMetadataCleanup = () => video.removeEventListener("loadedmetadata", adoptVideoDuration);
         video.load();
       }
 
@@ -306,19 +300,15 @@ export function Hero() {
         }
       };
 
-      if (!prefersStaticMobile) {
-        window.addEventListener("pointerdown", unlockSeeking, { once: true, passive: true });
-        unlockCleanup = () => window.removeEventListener("pointerdown", unlockSeeking);
-      }
+      window.addEventListener("pointerdown", unlockSeeking, { once: true, passive: true });
+      unlockCleanup = () => window.removeEventListener("pointerdown", unlockSeeking);
 
       return () => {
         loadedMetadataCleanup?.();
         unlockCleanup?.();
         playCleanup?.();
-        mobilePlaybackCleanup?.();
         scrollTrigger?.kill();
         scrubTween?.kill();
-        section.classList.remove("is-pin-complete");
       };
     },
     { scope: sectionRef },
@@ -326,17 +316,27 @@ export function Hero() {
 
   return (
     <section className="hero" id="container-story" ref={sectionRef}>
+      {/* Poster sits under the video as the base layer: it is the first frame,
+          so desktop sees no flash before the MP4 paints, and phones and
+          reduced-motion visitors see this alone. */}
+      <Image
+        alt=""
+        aria-hidden="true"
+        className="hero__poster"
+        fill
+        priority
+        sizes="100vw"
+        src={assetPath("/images/hero/hero-container-fallback.png")}
+      />
       <video
         aria-hidden="true"
         className="hero__video"
         disablePictureInPicture
         muted
         playsInline
-        preload="auto"
+        preload="none"
         ref={videoRef}
-      >
-        <source src={assetPath("/videos/box-video-scrub.mp4")} type="video/mp4" />
-      </video>
+      />
       <div className="hero__background" aria-hidden="true" />
       <div className="hero__smoke" aria-hidden="true">
         <span />
