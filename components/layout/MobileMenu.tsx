@@ -18,12 +18,12 @@ export function MobileMenu({ ctaLabel = "Contact Us", open, links, onClose }: Mo
       </button>
       <nav aria-label="Mobile navigation">
         {links.map((link) => (
-          <Link href={link.href} key={link.href} onClick={onClose}>
+          <Link href={link.href} key={link.href} onClick={onClose} prefetch>
             {link.label}
           </Link>
         ))}
       </nav>
-      <Link className="mobile-menu__cta" href="/contact" onClick={onClose}>
+      <Link className="mobile-menu__cta" href="/contact" onClick={onClose} prefetch>
         {ctaLabel}
       </Link>
     </div>

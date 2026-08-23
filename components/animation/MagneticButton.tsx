@@ -16,7 +16,7 @@ const variants = {
   dark: "border-charcoal bg-charcoal text-porcelain hover:bg-soft-black",
   light: "border-porcelain bg-porcelain text-charcoal hover:bg-white",
   outline: "border-current bg-transparent text-current hover:bg-charcoal hover:text-porcelain",
-  accent: "border-ember bg-ember text-white hover:bg-[#c95d24]",
+  accent: "border-ember bg-ember text-charcoal hover:bg-[#d99a00]",
 };
 
 export function MagneticButton({

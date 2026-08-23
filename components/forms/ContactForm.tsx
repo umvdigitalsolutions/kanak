@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { products } from "@/data/products";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import type { Product } from "@/data/products";
 import { Button } from "@/components/ui/Button";
 
 export type ContactInitialValues = {
@@ -32,7 +32,7 @@ type FormState = {
   message: string;
 };
 
-function initialForm(values: ContactInitialValues): FormState {
+function initialForm(values: ContactInitialValues, products: Product[]): FormState {
   const product = products.find((item) => item.slug === values.product);
   const containerType = product?.name ?? values.shape ?? "";
 
@@ -57,14 +57,50 @@ function initialForm(values: ContactInitialValues): FormState {
   };
 }
 
-export function ContactForm({ initialValues }: { initialValues: ContactInitialValues }) {
-  const [form, setForm] = useState<FormState>(() => initialForm(initialValues));
+function initialValuesFromUrl(): ContactInitialValues {
+  const search = new URLSearchParams(window.location.search);
+
+  return {
+    product: search.get("product") ?? undefined,
+    shape: search.get("shape") ?? undefined,
+    size: search.get("size") ?? undefined,
+    color: search.get("color") ?? undefined,
+    lid: search.get("lid") ?? undefined,
+    compartments: search.get("compartments") ?? undefined,
+    application: search.get("application") ?? undefined,
+    foodType: search.get("foodType") ?? undefined,
+    quantity: search.get("quantity") ?? undefined,
+  };
+}
+
+export function ContactForm({
+  initialValues,
+  products,
+}: {
+  initialValues: ContactInitialValues;
+  products: Product[];
+}) {
+  const [form, setForm] = useState<FormState>(() => initialForm(initialValues, products));
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [submitted, setSubmitted] = useState(false);
+  const [submitState, setSubmitState] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [submitMessage, setSubmitMessage] = useState("");
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const urlValues = initialValuesFromUrl();
+      const hasUrlValues = Object.values(urlValues).some(Boolean);
+
+      if (hasUrlValues) {
+        setForm(initialForm({ ...initialValues, ...urlValues }, products));
+      }
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [initialValues, products]);
 
   const selectedProduct = useMemo(
     () => products.find((product) => product.name === form.containerType),
-    [form.containerType],
+    [form.containerType, products],
   );
 
   const update = <Key extends keyof FormState>(key: Key, value: FormState[Key]) => {
@@ -82,17 +118,47 @@ export function ContactForm({ initialValues }: { initialValues: ContactInitialVa
     return Object.keys(nextErrors).length === 0;
   };
 
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitState("idle");
+    setSubmitMessage("");
+
+    if (!validate()) {
+      setSubmitState("error");
+      return;
+    }
+
+    setSubmitState("submitting");
+
+    try {
+      const response = await fetch("/api/inquiries", {
+        body: JSON.stringify(form),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      });
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok || !payload.ok) {
+        setErrors(payload.errors ?? {});
+        setSubmitState("error");
+        setSubmitMessage(payload.message ?? "Could not submit this quote request.");
+        return;
+      }
+
+      setErrors({});
+      setSubmitState("success");
+      setSubmitMessage("Quote request submitted. The team can now review it in the admin panel.");
+    } catch {
+      setSubmitState("error");
+      setSubmitMessage("Could not reach the backend. Please check MongoDB and deployment environment variables.");
+    }
+  };
+
   return (
     <form
       className="quote-form"
       noValidate
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(false);
-        if (validate()) {
-          setSubmitted(true);
-        }
-      }}
+      onSubmit={submit}
     >
       <div className="form-grid">
         <label>
@@ -208,14 +274,14 @@ export function ContactForm({ initialValues }: { initialValues: ContactInitialVa
         <p className="form-note">Product specifications on this site are placeholders until verified by the manufacturer.</p>
       ) : null}
 
-      {submitted ? (
-        <div className="demo-submit" role="status">
-          Quote request prepared in frontend demo mode. Connect an API or email service before treating this as delivered.
+      {submitMessage ? (
+        <div className={submitState === "error" ? "form-error" : "demo-submit"} role="status">
+          {submitMessage}
         </div>
       ) : null}
 
       <Button type="submit" variant="accent">
-        Request Quote
+        {submitState === "submitting" ? "Submitting..." : "Request Quote"}
       </Button>
     </form>
   );

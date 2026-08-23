@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, useState, type CSSProperties } from "react";
 import { useGSAP } from "@gsap/react";
 import { Box, Factory, Layers3, Leaf, PackageCheck, Recycle, Rows3, ShieldCheck } from "lucide-react";
 import { ensureGsap } from "@/lib/animations";
 import { Container } from "@/components/ui/Container";
+import { assetPath } from "@/lib/assets";
 
 const materials = [
   {
@@ -30,20 +32,23 @@ const materials = [
 ] as const;
 
 const views = [
-  { icon: Rows3, id: "section", label: "Section" },
-  { icon: Box, id: "solid", label: "Solid" },
+  { icon: Box, id: "solid", label: "Real view" },
+  { icon: Rows3, id: "section", label: "Cutaway" },
 ] as const;
 
 type MaterialId = (typeof materials)[number]["id"];
 type ViewId = (typeof views)[number]["id"];
+
+const materialProductShots: Record<MaterialId, { height: number; src: string; width: number }> = {
+  bio: { height: 1254, src: "/images/generated/biodegradable-container-cutout.png", width: 1254 },
+  plastic: { height: 1024, src: "/images/generated/real-container-cutout.png", width: 1536 },
+};
 
 const qualityChecks = [
   { icon: ShieldCheck, label: "Food-contact grade" },
   { icon: Layers3, label: "Stackable geometry" },
   { icon: PackageCheck, label: "Lid-fit check" },
 ] as const;
-
-const flowSteps = ["Material", "Moulding", "Lid fit", "Packed supply"];
 
 /* Leader callouts, anchored by their dot at a percentage of the viewport so the
    label can grow in either direction without dragging the pointer off-feature. */
@@ -60,21 +65,21 @@ const marks = [
 const BODY_RING_COUNT = 67;
 const LID_RING_COUNT = 17;
 
-/** Radius profile of the tub, sampled from the base (t=0) to the rim flange (t=1). */
+/** Radius profile of a squat takeaway tub, sampled from the base (t=0) to the rim flange (t=1). */
 function bodyRadius(t: number) {
-  if (t < 0.06) return 0.7 + (t / 0.06) * 0.05; // heel flare off the base
-  if (t < 0.86) return 0.75 + Math.pow((t - 0.06) / 0.8, 0.85) * 0.19; // convex draft angle
-  if (t < 0.92) return 0.94 - ((t - 0.86) / 0.06) * 0.035; // lid-seat groove
-  if (t < 0.97) return 0.905 + ((t - 0.92) / 0.05) * 0.085;
-  return 0.99 + ((t - 0.97) / 0.03) * 0.07; // rim flange
+  if (t < 0.08) return 0.84 + (t / 0.08) * 0.035; // broad stackable foot
+  if (t < 0.76) return 0.875 + ((t - 0.08) / 0.68) * 0.075; // shallow draft, not a bowl curve
+  if (t < 0.88) return 0.95 - ((t - 0.76) / 0.12) * 0.018; // lid-seat groove
+  if (t < 0.96) return 0.932 + ((t - 0.88) / 0.08) * 0.085; // snap rim
+  return 1.017 + ((t - 0.96) / 0.04) * 0.028; // outer flange
 }
 
-/** Radius profile of the lid, from the outer flange (t=0) to the flat top plateau (t=1). */
+/** Radius profile of a thin transparent lid, from outer flange (t=0) to the flat top plateau (t=1). */
 function lidRadius(t: number) {
-  if (t < 0.18) return 1.06 - (t / 0.18) * 0.07; // overhanging flange
-  if (t < 0.45) return 0.99 - ((t - 0.18) / 0.27) * 0.06; // shoulder off the seat
-  if (t < 0.75) return 0.93 - ((t - 0.45) / 0.3) * 0.07;
-  return 0.86 - ((t - 0.75) / 0.25) * 0.12; // plateau edge
+  if (t < 0.14) return 1.055 - (t / 0.14) * 0.035; // clear overhanging flange
+  if (t < 0.36) return 1.02 - ((t - 0.14) / 0.22) * 0.04; // shallow shoulder
+  if (t < 0.72) return 0.98 - ((t - 0.36) / 0.36) * 0.055; // broad flat window
+  return 0.925 - ((t - 0.72) / 0.28) * 0.055; // raised centre plateau
 }
 
 function lathe(count: number, radius: (t: number) => number) {
@@ -102,9 +107,10 @@ export function KitchenToCustomer() {
   const lab = useRef<LabHandle | null>(null);
   const specMounted = useRef(false);
   const [active, setActive] = useState<MaterialId>("plastic");
-  const [view, setView] = useState<ViewId>("section");
+  const [view, setView] = useState<ViewId>("solid");
 
   const activeMaterial = materials.find((item) => item.id === active) ?? materials[0];
+  const activeProductShot = materialProductShots[active];
 
   useGSAP(
     () => {
@@ -458,7 +464,7 @@ export function KitchenToCustomer() {
             <div className="material-lab__bar">
               <span className="material-lab__tag">
                 <Factory size={15} strokeWidth={1.9} />
-                Turntable view
+                Product preview
               </span>
 
               <span className="material-lab__finish">{activeMaterial.finish}</span>
@@ -523,12 +529,26 @@ export function KitchenToCustomer() {
                                 style={{ "--r": ring.r, "--t": ring.t } as CSSProperties}
                               />
                             ))}
+                            <span className="material-lid-window" />
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div aria-hidden="true" className={`material-product-shot material-product-shot--${active}`}>
+                <Image
+                  alt=""
+                  className="material-product-shot__image"
+                  height={activeProductShot.height}
+                  key={activeProductShot.src}
+                  priority
+                  sizes="(max-width: 680px) 92vw, 44vw"
+                  src={assetPath(activeProductShot.src)}
+                  width={activeProductShot.width}
+                />
               </div>
 
               <span aria-hidden="true" className="material-lab__grain" />
@@ -565,8 +585,9 @@ export function KitchenToCustomer() {
             </div>
 
             <p className="material-lab__caption">
-              Scroll to orbit the model. Switching material lifts the lid and re-forms the wall.
-              <span className="material-lab__hint"> Hover to lift the lid off its seat.</span>
+              {active === "bio"
+                ? "Real kraft-board preview with a fibrous biodegradable finish. Switch to cutaway for wall geometry."
+                : "Real product preview with a clear-lid finish. Switch to cutaway for rim and wall geometry."}
             </p>
 
             <div aria-label="Manufacturing checks" className="material-checks">
@@ -582,11 +603,6 @@ export function KitchenToCustomer() {
               })}
             </div>
 
-            <div aria-label="Production flow" className="material-flow">
-              {flowSteps.map((step) => (
-                <span key={step}>{step}</span>
-              ))}
-            </div>
           </div>
         </div>
       </Container>

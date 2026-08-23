@@ -5,7 +5,6 @@ import { company } from "@/data/company";
 import { assetPath } from "@/lib/assets";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
-import { RouteTransition } from "@/components/animation/RouteTransition";
 import { ScrollProgress } from "@/components/animation/ScrollProgress";
 import { SmoothScroll } from "@/components/animation/SmoothScroll";
 
@@ -52,7 +51,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <SmoothScroll />
         <ScrollProgress />
-        <RouteTransition />
         <Header />
         <main>{children}</main>
         <Footer />

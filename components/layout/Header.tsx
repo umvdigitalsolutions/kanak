@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -30,18 +31,25 @@ export function Header() {
   return (
     <>
       <header className={scrolled ? "site-nav is-scrolled" : "site-nav"}>
-        <Link className="site-nav__brand" href="/" aria-label="Kanak Mouldings home">
-          <span>Kanak</span>
-          <span>Mouldings</span>
+        <Link className="site-nav__brand" href="/" aria-label="Kanak Mouldings home" prefetch>
+          <Image
+            alt=""
+            className="site-nav__logo"
+            height={500}
+            priority
+            sizes="96px"
+            src="/images/Kanak%20Logo.png"
+            width={500}
+          />
         </Link>
         <nav className="site-nav__links" aria-label="Primary navigation">
           {links.map((link) => (
-            <Link className={isActive(link.href) ? "is-active" : ""} href={link.href} key={link.href}>
+            <Link className={isActive(link.href) ? "is-active" : ""} href={link.href} key={link.href} prefetch>
               {link.label}
             </Link>
           ))}
         </nav>
-        <Link className="site-nav__cta" href="/contact">
+        <Link className="site-nav__cta" href="/contact" prefetch>
           Contact Us
         </Link>
         <button

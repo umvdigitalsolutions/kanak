@@ -2,6 +2,7 @@ import { assetPath } from "@/lib/assets";
 
 export type ContainerShape = "rectangular" | "round" | "square" | "tray";
 export type ContainerColor = "black" | "white" | "clear" | "custom";
+export type ProductCategoryName = "Plastic Containers" | "Biodegradables";
 
 export type Product = {
   id: string;
@@ -23,7 +24,11 @@ export type Product = {
   image: string | null;
   gallery: string[];
   featured: boolean;
+  isPublished?: boolean;
+  order?: number;
   placeholderSpecification: boolean;
+  createdAt?: string;
+  updatedAt?: string;
   visual: {
     baseColor: ContainerColor;
     compartments: number;
@@ -37,6 +42,8 @@ const confirm = "Confirm with manufacturer";
 
 export const productFilters = [
   "All",
+  "Plastic Containers",
+  "Biodegradables",
   "Round",
   "Rectangular",
   "Black",
@@ -45,12 +52,14 @@ export const productFilters = [
   "Custom",
 ] as const;
 
+export const primaryProductCategories: ProductCategoryName[] = ["Plastic Containers", "Biodegradables"];
+
 export const products: Product[] = [
   {
     id: "P-ROUND-BLK",
     slug: "round-container-black",
     name: "Round Container - Black",
-    category: "Round",
+    category: "Plastic Containers",
     shape: "round",
     shortDescription:
       "A black round food-grade packaging container with a clear, airtight lid direction for takeaway service.",
@@ -81,7 +90,7 @@ export const products: Product[] = [
     id: "P-ROUND-WHT",
     slug: "round-container-white",
     name: "Round Container - White",
-    category: "Round",
+    category: "Plastic Containers",
     shape: "round",
     shortDescription:
       "A clean white round packaging container for food-service menus that need a lighter presentation.",
@@ -112,7 +121,7 @@ export const products: Product[] = [
     id: "P-RECT-CLR",
     slug: "rectangle-container-transparent",
     name: "Rectangle Container - Transparent",
-    category: "Rectangular",
+    category: "Plastic Containers",
     shape: "rectangular",
     shortDescription:
       "A transparent rectangular food container for display-led takeaway, packing and storage workflows.",
@@ -143,7 +152,7 @@ export const products: Product[] = [
     id: "P-RECT-BLK",
     slug: "rectangle-container-black",
     name: "Rectangle Container - Black",
-    category: "Rectangular",
+    category: "Plastic Containers",
     shape: "rectangular",
     shortDescription:
       "A black rectangular food-grade packaging container with a clear lid direction for delivery-ready meals.",
@@ -174,7 +183,7 @@ export const products: Product[] = [
     id: "P-CUSTOM",
     slug: "custom-food-packaging-container",
     name: "Custom Food Packaging Container",
-    category: "Custom",
+    category: "Plastic Containers",
     shape: "rectangular",
     shortDescription:
       "A quotation path for food-service teams that need a specific shape, capacity, colour or lid direction.",
@@ -195,6 +204,61 @@ export const products: Product[] = [
     placeholderSpecification: true,
     visual: { baseColor: "custom", compartments: 3, lid: true, accent: "rice" },
   },
+  {
+    id: "B-CLAM-BOX",
+    slug: "biodegradable-clamshell-box",
+    name: "Biodegradable Clamshell Box",
+    category: "Biodegradables",
+    shape: "tray",
+    shortDescription:
+      "A kraft-style clamshell food box for takeaway meals that need a biodegradable packaging direction.",
+    description:
+      "A biodegradable clamshell food box direction for restaurants, caterers and cloud kitchens looking for paper-fiber takeaway packaging with a secure closing profile.",
+    capacity: "Capacity range to be confirmed",
+    dimensions: pending,
+    colourOptions: ["Natural Kraft"],
+    lidOptions: ["Attached Lid", "Fold-lock Closure"],
+    compartments: [1],
+    material: "Biodegradable paper-fiber direction",
+    applications: ["Takeaway meals", "Bakery items", "Cafe meals", "Catering packs"],
+    features: [
+      "Biodegradable packaging direction",
+      "Fold-lock lid profile",
+      "Stackable for dispatch",
+      "Food-service presentation",
+    ],
+    customisation: "Size, GSM, print direction and order quantity can be confirmed during quotation.",
+    image: assetPath("/images/generated/hero-real-float/biodegradable-empty-clamshell.webp"),
+    gallery: [assetPath("/images/generated/container-carousel/biodegradable-clamshell.webp")],
+    featured: true,
+    placeholderSpecification: true,
+    visual: { baseColor: "custom", compartments: 1, lid: true, accent: "empty" },
+  },
+  {
+    id: "B-COFFEE-CUP",
+    slug: "biodegradable-coffee-cups",
+    name: "Biodegradable Coffee Cups",
+    category: "Biodegradables",
+    shape: "round",
+    shortDescription:
+      "Biodegradable takeaway coffee cups for cafes, beverage counters and event-service requirements.",
+    description:
+      "A biodegradable coffee cup direction for hot beverage service, cafe dispatch and branded counter packaging enquiries.",
+    capacity: "Cup size range to be confirmed",
+    dimensions: pending,
+    colourOptions: ["Natural", "White", "Custom Print"],
+    lidOptions: ["Sip Lid", "Matching Lid"],
+    compartments: [1],
+    material: "Biodegradable paper-cup direction",
+    applications: ["Coffee counters", "Tea service", "Events", "Cafe takeaway"],
+    features: ["Hot beverage packaging direction", "Branding discussion", "Lid option support", "Bulk supply enquiry"],
+    customisation: "Cup size, lid type, print artwork and quantity can be confirmed during quotation.",
+    image: assetPath("/images/generated/hero-real-float/biodegradable-coffee-cups.webp"),
+    gallery: [assetPath("/images/generated/container-carousel/biodegradable-coffee-cups.webp")],
+    featured: true,
+    placeholderSpecification: true,
+    visual: { baseColor: "custom", compartments: 1, lid: true, accent: "empty" },
+  },
 ];
 
 export const featuredProducts = products.filter((product) => product.featured);
@@ -203,22 +267,40 @@ export function getProductBySlug(slug: string) {
   return products.find((product) => product.slug === slug);
 }
 
-export function productsByFilter(filter: string) {
+export function productsByFilter(filter: string, sourceProducts: Product[] = products) {
   if (filter === "All") {
-    return products;
+    return sourceProducts;
+  }
+
+  if (primaryProductCategories.includes(filter as ProductCategoryName)) {
+    return sourceProducts.filter((product) => product.category === filter);
+  }
+
+  if (filter === "Round") {
+    return sourceProducts.filter((product) => product.shape === "round");
+  }
+
+  if (filter === "Rectangular") {
+    return sourceProducts.filter((product) => product.shape === "rectangular" || product.shape === "tray");
   }
 
   if (filter === "Black") {
-    return products.filter((product) => product.colourOptions.includes("Black") || product.visual.baseColor === "black");
+    return sourceProducts.filter((product) => product.colourOptions.includes("Black") || product.visual.baseColor === "black");
   }
 
   if (filter === "White") {
-    return products.filter((product) => product.colourOptions.includes("White") || product.visual.baseColor === "white");
+    return sourceProducts.filter((product) => product.colourOptions.includes("White") || product.visual.baseColor === "white");
   }
 
   if (filter === "Transparent") {
-    return products.filter((product) => product.colourOptions.includes("Transparent") || product.visual.baseColor === "clear");
+    return sourceProducts.filter((product) => product.colourOptions.includes("Transparent") || product.visual.baseColor === "clear");
   }
 
-  return products.filter((product) => product.category === filter);
+  if (filter === "Custom") {
+    return sourceProducts.filter(
+      (product) => product.visual.baseColor === "custom" || product.colourOptions.some((option) => option.toLowerCase().includes("custom")),
+    );
+  }
+
+  return sourceProducts.filter((product) => product.category === filter);
 }

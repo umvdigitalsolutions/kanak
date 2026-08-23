@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { Product } from "@/data/products";
 import { ProductVisual } from "@/components/ui/ProductVisual";
+import { productDisplayImage } from "@/lib/product-visual-assets";
 
 type ProductCardProps = {
   product: Product;
@@ -15,7 +16,7 @@ export function ProductCard({ product }: ProductCardProps) {
           accent={product.visual.accent}
           baseColor={product.visual.baseColor}
           compartments={product.visual.compartments}
-          image={product.image}
+          image={productDisplayImage(product)}
           alt={product.name}
           lid={product.visual.lid}
           shape={product.shape}

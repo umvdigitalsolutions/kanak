@@ -34,3 +34,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Backend and Admin
+
+This project supports MongoDB-backed products, gallery items and contact inquiries.
+
+Required environment variables:
+
+```bash
+MONGODB_URI=
+MONGODB_DB=kanakmouldings
+ADMIN_PASSWORD=
+ADMIN_SESSION_SECRET=
+```
+
+Open `/admin/login` after setting the variables. The public site falls back to the static product data when MongoDB is not configured.

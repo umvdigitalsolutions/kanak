@@ -1,44 +1,66 @@
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
+import { HeroCorner3DFigures } from "@/components/home/HeroCorner3DFigures";
 import { assetPath } from "@/lib/assets";
+import { defaultHomeHero, type HomeHeroSettings } from "@/data/site";
 
-const heroSpecs = ["Food-grade material focus", "Secure lid-fit range", "Bulk supply for food service"];
+function videoType(src: string) {
+  if (src.endsWith(".webm")) return "video/webm";
+  if (src.endsWith(".mov")) return "video/quicktime";
+  return "video/mp4";
+}
 
-export function TopHero() {
+export function TopHero({ settings = defaultHomeHero }: { settings?: HomeHeroSettings }) {
+  const specs = settings.specs.length ? settings.specs : defaultHomeHero.specs;
+
   return (
     <section className="top-hero" id="home">
-      <video
-        aria-hidden="true"
-        autoPlay
-        className="top-hero__video"
-        disablePictureInPicture
-        loop
-        muted
-        playsInline
-        poster={assetPath("/images/hero/hero-container-fallback.png")}
-        preload="metadata"
-      >
-        <source src={assetPath("/videos/containers.mp4")} type="video/mp4" />
-      </video>
       <div className="top-hero__shade" aria-hidden="true" />
       <div className="top-hero__content">
         <div className="top-hero__copy">
-          <p className="kicker">Food packaging manufacturer</p>
-          <h1>Food delivery containers made for scale.</h1>
-          <p>
-            Rigid round and rectangular food containers built around material consistency,
-            practical stacking, reliable lid fit and food-service supply requirements.
-          </p>
+          <p className="kicker">{settings.kicker}</p>
+          <h1>{settings.title}</h1>
+          <p>{settings.copy}</p>
           <div className="top-hero__actions">
-            <Button href="/products" variant="light">
-              View Product Range
+            <Button href={settings.primaryHref} variant="accent">
+              {settings.primaryLabel}
             </Button>
-            <Button href="/contact" variant="outline">
-              Request Specifications
+            <Button href={settings.secondaryHref} variant="outline">
+              {settings.secondaryLabel}
             </Button>
           </div>
         </div>
+        <div className="top-hero__visual" aria-label="Kanak Mouldings food container showcase">
+          <div className="top-hero__image top-hero__image--primary">
+            {settings.mediaType === "image" ? (
+              <Image
+                alt="Kanak Mouldings food container hero visual"
+                className="top-hero__video"
+                fill
+                priority
+                sizes="(max-width: 980px) 100vw, 56vw"
+                src={assetPath(settings.mediaSrc)}
+              />
+            ) : (
+              <video
+                aria-label="Food packed in a clear-lid Kanak food container"
+                autoPlay
+                className="top-hero__video"
+                disablePictureInPicture
+                loop
+                muted
+                playsInline
+                poster={assetPath(settings.posterSrc)}
+                preload="metadata"
+              >
+                <source src={assetPath(settings.mediaSrc)} type={videoType(settings.mediaSrc)} />
+              </video>
+            )}
+          </div>
+          <HeroCorner3DFigures />
+        </div>
         <div className="top-hero__specs" aria-label="Container manufacturing highlights">
-          {heroSpecs.map((spec) => (
+          {specs.map((spec) => (
             <span key={spec}>{spec}</span>
           ))}
         </div>
