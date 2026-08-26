@@ -221,7 +221,9 @@ export function DeliveryStory3D() {
 
       <Container className="delivery-3d-static">
         <div className="delivery-3d-static__visual" aria-hidden="true">
+          <span className="delivery-3d-static__speed" />
           <Image alt="" height={1122} sizes="(max-width: 767px) 88vw, 34rem" src={deliveryScootyImage} width={1402} />
+          <span className="delivery-3d-static__road" />
         </div>
         <p className="kicker">Delivery packaging performance</p>
         <h2>Container quality that travels well.</h2>
