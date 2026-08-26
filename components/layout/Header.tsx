@@ -19,14 +19,23 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const isAdminRoute = pathname.startsWith("/admin");
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   useEffect(() => {
+    if (isAdminRoute) {
+      return;
+    }
+
     const update = () => setScrolled(window.scrollY > 20);
     update();
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
-  }, []);
+  }, [isAdminRoute]);
+
+  if (isAdminRoute) {
+    return null;
+  }
 
   return (
     <>

@@ -11,6 +11,11 @@ import { Button } from "@/components/ui/Button";
 
 export function ProductTypes({ products }: { products: Product[] }) {
   const root = useRef<HTMLElement>(null);
+  const previewProducts = [
+    ...products.filter((product) => product.category === "Plastic Containers").slice(0, 2),
+    ...products.filter((product) => product.category === "Biodegradables").slice(0, 2),
+  ];
+  const displayProducts = previewProducts.length >= 3 ? previewProducts : products.slice(0, 4);
 
   useGSAP(
     () => {
@@ -18,7 +23,8 @@ export function ProductTypes({ products }: { products: Product[] }) {
       if (!scope) return;
 
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (prefersReducedMotion) return;
+      const compactViewport = window.matchMedia("(max-width: 767px)").matches;
+      if (prefersReducedMotion || compactViewport) return;
 
       const { gsap } = ensureGsap();
       const introParts = gsap.utils.toArray<HTMLElement>("[data-product-list-part]", scope);
@@ -93,7 +99,7 @@ export function ProductTypes({ products }: { products: Product[] }) {
           </Button>
         </div>
         <div className="product-grid product-grid--gsap">
-          {products.map((product) => (
+          {displayProducts.map((product) => (
             <ProductCard key={product.slug} product={product} />
           ))}
         </div>

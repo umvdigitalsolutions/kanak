@@ -31,7 +31,9 @@ export default async function ProductsPage() {
         <div className="products-page__hero">
           <div className="products-page__copy">
             <p className="kicker">Product Range</p>
-            <h1>Plastic containers and biodegradable packaging.</h1>
+            <h1>
+              Plastic containers and bio<wbr />degradable packaging.
+            </h1>
             <p>
               Browse food-service packaging for restaurants, cloud kitchens, caterers and delivery-led businesses,
               organised into two clear product families.
@@ -49,7 +51,7 @@ export default async function ProductsPage() {
                 <Boxes size={21} strokeWidth={1.7} />
                 <span>
                   <strong>Plastic Containers</strong>
-                  Round, rectangular, black, white and transparent formats.
+                  Core food packaging containers and custom container enquiries.
                 </span>
                 <em>{plasticCount.toString().padStart(2, "0")}</em>
               </Link>
@@ -57,7 +59,7 @@ export default async function ProductsPage() {
                 <Leaf size={21} strokeWidth={1.7} />
                 <span>
                   <strong>Biodegradables</strong>
-                  Kraft, paper-fiber and beverage packaging directions.
+                  Paper cups, bowls, boxes, trays, wraps and meal packaging.
                 </span>
                 <em>{biodegradableCount.toString().padStart(2, "0")}</em>
               </Link>

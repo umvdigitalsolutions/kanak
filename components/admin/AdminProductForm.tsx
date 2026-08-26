@@ -127,6 +127,11 @@ export function AdminProductForm({ categories = [], product }: { categories?: Pr
           <input name="capacity" defaultValue={product?.capacity ?? ""} />
         </label>
         <label>
+          Available Sizes
+          <small>Write one per line. Example: 500 ML, 750 ML, 1000 ML</small>
+          <textarea name="sizeOptions" defaultValue={lines(product?.sizeOptions)} rows={4} />
+        </label>
+        <label>
           Dimensions
           <small>Example: Top 12 cm, height 6 cm</small>
           <input name="dimensions" defaultValue={product?.dimensions ?? ""} />

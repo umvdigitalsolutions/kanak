@@ -28,6 +28,7 @@ function productInputFromForm(formData: FormData): ProductInput {
     shortDescription: formString(formData, "shortDescription"),
     description: formString(formData, "description"),
     capacity: formString(formData, "capacity"),
+    sizeOptions: splitLines(formString(formData, "sizeOptions")),
     dimensions: formString(formData, "dimensions"),
     colourOptions: splitLines(formString(formData, "colourOptions")),
     lidOptions: splitLines(formString(formData, "lidOptions")),

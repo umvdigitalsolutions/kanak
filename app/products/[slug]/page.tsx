@@ -69,7 +69,24 @@ function displayValue(value: string | null | undefined, fallback = "Confirm duri
   return isMeaningful(value) ? String(value) : fallback;
 }
 
+function productSizeOptions(product: Product) {
+  if (product.sizeOptions?.length) {
+    return product.sizeOptions;
+  }
+
+  return isMeaningful(product.capacity) ? [product.capacity] : [];
+}
+
+function sizeSummary(sizes: string[]) {
+  if (sizes.length > 1) {
+    return `${sizes[0]} - ${sizes[sizes.length - 1]}`;
+  }
+
+  return sizes[0] || "Size on request";
+}
+
 function buildSpecs(product: Product): SpecItem[] {
+  const sizes = joinValues(productSizeOptions(product));
   const specs: SpecItem[] = [
     { label: "Product Code", value: product.id },
     { label: "Category", value: product.category },
@@ -77,6 +94,7 @@ function buildSpecs(product: Product): SpecItem[] {
   ];
 
   if (isMeaningful(product.capacity)) specs.push({ label: "Capacity", value: product.capacity });
+  if (sizes) specs.push({ label: "Available Sizes", value: sizes });
   if (isMeaningful(product.material)) specs.push({ label: "Material", value: product.material });
   if (isMeaningful(product.dimensions)) specs.push({ label: "Dimensions", value: product.dimensions });
 
@@ -170,6 +188,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
   const products = await getProducts();
   const specs = buildSpecs(product);
+  const sizeOptions = productSizeOptions(product);
   const badges = buildBadges(product);
   const applications = applicationSlides(product);
   const related = relatedProducts(product, products);
@@ -254,6 +273,19 @@ export default async function ProductDetailPage({ params }: Props) {
                   View Specifications
                 </Button>
               </div>
+
+              {sizeOptions.length ? (
+                <label className="pdp-size-picker">
+                  <span>Choose Size</span>
+                  <select defaultValue={sizeOptions[0]} aria-label={`${product.name} available size`}>
+                    {sizeOptions.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
             </div>
 
             <div className="pdp-hero__visual-wrap">
@@ -278,7 +310,7 @@ export default async function ProductDetailPage({ params }: Props) {
                 </span>
                 <span>
                   <Ruler size={17} />
-                  {displayValue(product.capacity)}
+                  {sizeSummary(sizeOptions)}
                 </span>
                 <span>
                   <Layers3 size={17} />
@@ -527,11 +559,11 @@ export default async function ProductDetailPage({ params }: Props) {
                 key={item.slug}
               >
                 <div className="pdp-variant-card__image">
-                <Image alt={item.name} fill sizes="15rem" src={productImage(item)} />
+                  <Image alt={item.name} fill sizes="15rem" src={productImage(item)} />
                 </div>
                 <span>{item.id}</span>
                 <h3>{item.name}</h3>
-                <p>{displayValue(item.capacity, "Specification on request")}</p>
+                <p>{sizeSummary(productSizeOptions(item))}</p>
                 <strong>{item.slug === product.slug ? "Current Product" : "View Product"}</strong>
               </Link>
             ))}
@@ -586,7 +618,7 @@ export default async function ProductDetailPage({ params }: Props) {
                 View Product Catalogue
               </Button>
             </div>
-            <ProductEnquiryForm productName={product.name} />
+            <ProductEnquiryForm productName={product.name} sizeOptions={sizeOptions} />
           </div>
         </Container>
       </section>

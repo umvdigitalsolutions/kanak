@@ -1,6 +1,6 @@
 import { TopHero } from "@/components/home/TopHero";
 import { ContainerCarousel } from "@/components/home/ContainerCarousel";
-import { KitchenToCustomer } from "@/components/home/KitchenToCustomer";
+import { GlobalPresence } from "@/components/home/GlobalPresence";
 import { DeliveryStory3D } from "@/components/delivery-story-3d/DeliveryStory3D";
 import { ProductTypes } from "@/components/home/ProductTypes";
 import { ColorSwitcher } from "@/components/home/ColorSwitcher";
@@ -15,10 +15,10 @@ export default async function Home() {
 
   return (
     <>
+      <DeliveryStory3D />
       <TopHero settings={siteSettings.hero} />
       <ContainerCarousel slides={siteSettings.containerSlides} />
-      <KitchenToCustomer />
-      <DeliveryStory3D />
+      <GlobalPresence />
       <ProductTypes products={products} />
       <ColorSwitcher />
       <FinalCTA />
