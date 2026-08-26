@@ -25,6 +25,7 @@ export function ProductVisual({
   className,
 }: ProductVisualProps) {
   const hasSourceImage = Boolean(image);
+  const isProductShot = Boolean(image?.includes("/images/generated/product-variants/"));
   const imageSrc = image ?? assetPath("/images/generated/cinematic-noodle-container.png");
   const labels = [
     shape,
@@ -41,6 +42,7 @@ export function ProductVisual({
         `product-visual--${shape}`,
         `product-visual--${baseColor}`,
         hasSourceImage && "product-visual--source",
+        isProductShot && "product-visual--product-shot",
         className,
       )}
       aria-hidden={alt ? undefined : true}

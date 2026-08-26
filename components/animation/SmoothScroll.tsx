@@ -8,8 +8,13 @@ import { ensureGsap } from "@/lib/animations";
 export function SmoothScroll() {
   const lenisRef = useRef<Lenis | null>(null);
   const pathname = usePathname();
+  const isAdminRoute = pathname.startsWith("/admin");
 
   useEffect(() => {
+    if (isAdminRoute) {
+      return;
+    }
+
     const { gsap, ScrollTrigger } = ensureGsap();
 
     if (
@@ -37,11 +42,15 @@ export function SmoothScroll() {
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, []);
+  }, [isAdminRoute]);
 
   useEffect(() => {
+    if (isAdminRoute) {
+      return;
+    }
+
     lenisRef.current?.scrollTo(0, { immediate: true });
-  }, [pathname]);
+  }, [isAdminRoute, pathname]);
 
   return null;
 }

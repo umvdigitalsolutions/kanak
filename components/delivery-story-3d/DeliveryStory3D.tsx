@@ -10,7 +10,7 @@ import { StoryHud, StoryOverlay } from "@/components/delivery-story-3d/StoryOver
 import { beatIndexForProgress, mix, range, smoothRange, storyBeats } from "@/components/delivery-story-3d/storyProgress";
 import { assetPath } from "@/lib/assets";
 
-const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
+const scrollStoryQuery = "(min-width: 768px) and (prefers-reduced-motion: no-preference)";
 const deliverySceneryImage = assetPath("/scenery.png");
 const deliveryLocationImage = assetPath("/location.png");
 const deliveryScootyImage = assetPath("/scooty-grounded.png");
@@ -29,21 +29,20 @@ function getServerSnapshot() {
   return false;
 }
 
-function subscribeReducedMotion(onStoreChange: () => void) {
-  const query = window.matchMedia(reducedMotionQuery);
+function subscribeScrollStory(onStoreChange: () => void) {
+  const query = window.matchMedia(scrollStoryQuery);
   query.addEventListener("change", onStoreChange);
   return () => query.removeEventListener("change", onStoreChange);
 }
 
-function getReducedMotionSnapshot() {
-  return window.matchMedia(reducedMotionQuery).matches;
+function getScrollStorySnapshot() {
+  return window.matchMedia(scrollStoryQuery).matches;
 }
 
 function setCompositeVars(root: HTMLElement, progress: number) {
   const finalIn = smoothRange(progress, 0.93, 1);
-  const riderIn = smoothRange(progress, 0.08, 0.18);
   const riderOut = smoothRange(progress, 0.78, 0.86);
-  const travel = range(progress, 0.08, 0.78);
+  const travel = range(progress, 0, 0.78);
   const destinationIn = smoothRange(progress, 0.66, 0.82) * (1 - smoothRange(progress, 0.86, 0.94));
   const handover = smoothRange(progress, 0.82, 0.9) * (1 - smoothRange(progress, 0.92, 0.98));
   const containerIn = smoothRange(progress, 0.95, 1);
@@ -57,10 +56,10 @@ function setCompositeVars(root: HTMLElement, progress: number) {
   root.style.setProperty("--road-opacity", String((1 - destinationIn) * (1 - finalIn)));
   root.style.setProperty("--final-opacity", String(finalIn));
 
-  root.style.setProperty("--scooter-opacity", String(riderIn * (1 - riderOut)));
-  root.style.setProperty("--scooter-x", `${mix(-24, 76, travel).toFixed(3)}vw`);
+  root.style.setProperty("--scooter-opacity", String(1 - riderOut));
+  root.style.setProperty("--scooter-x", `${mix(21, 76, travel).toFixed(3)}vw`);
   root.style.setProperty("--scooter-y", `${mix(94, 90.5, travel).toFixed(3)}vh`);
-  root.style.setProperty("--scooter-scale", String(mix(0.44, 0.6, travel)));
+  root.style.setProperty("--scooter-scale", String(mix(0.5, 0.6, travel)));
 
   root.style.setProperty("--handover-opacity", String(handover));
   root.style.setProperty("--handover-x", `${mix(68, 62, smoothRange(progress, 0.82, 0.92)).toFixed(3)}vw`);
@@ -142,12 +141,12 @@ export function DeliveryStory3D() {
     getClientReadySnapshot,
     getServerSnapshot,
   );
-  const reducedMotion = useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotionSnapshot,
+  const scrollStoryReady = useSyncExternalStore(
+    subscribeScrollStory,
+    getScrollStorySnapshot,
     getServerSnapshot,
   );
-  const enableScrollStory = clientReady && !reducedMotion;
+  const enableScrollStory = clientReady && scrollStoryReady;
 
   useGSAP(
     () => {
@@ -209,7 +208,7 @@ export function DeliveryStory3D() {
   );
 
   return (
-    <section className="delivery-3d" data-delivery-beat={activeIndex} ref={rootRef}>
+    <section className="delivery-3d" data-delivery-beat={activeIndex} id="home" ref={rootRef}>
       <div className="delivery-3d__pin">
         <DeliveryCompositeLayers />
 
@@ -221,6 +220,9 @@ export function DeliveryStory3D() {
       </div>
 
       <Container className="delivery-3d-static">
+        <div className="delivery-3d-static__visual" aria-hidden="true">
+          <Image alt="" height={1122} sizes="(max-width: 767px) 88vw, 34rem" src={deliveryScootyImage} width={1402} />
+        </div>
         <p className="kicker">Delivery packaging performance</p>
         <h2>Container quality that travels well.</h2>
         <p className="section-copy">

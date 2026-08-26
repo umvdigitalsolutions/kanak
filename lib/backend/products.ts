@@ -30,6 +30,17 @@ type GetProductsOptions = {
 const shapeValues = new Set<ContainerShape>(["rectangular", "round", "square", "tray"]);
 const colorValues = new Set<ContainerColor>(["black", "white", "clear", "custom"]);
 const accentValues = new Set(["rice", "curry", "noodles", "dessert", "salad", "empty"]);
+const deprecatedProductSlugs = new Set(["biodegradable-paper-bowl-series"]);
+const suppliedProductVariantImages = new Map([
+  ["biodegradable-kraft-paper-bowl", assetPath("/images/generated/product-variants/provided/bio-kraft-paper-bowl.webp")],
+  ["white-silver-paper-bowl", assetPath("/images/generated/product-variants/provided/bio-silver-paper-bowl.webp")],
+  ["biodegradable-white-paper-bowl", assetPath("/images/generated/product-variants/provided/bio-white-paper-bowl.webp")],
+  ["transparent-paper-bowl-lid", assetPath("/images/generated/product-variants/provided/bio-clear-bowl-lid.webp")],
+  ["kraft-paper-bucket-with-lid", assetPath("/images/generated/product-variants/provided/bio-kraft-paper-bucket-lid.webp")],
+  ["white-silver-paper-bucket-with-lid", assetPath("/images/generated/product-variants/provided/bio-silver-paper-bucket-lid.webp")],
+  ["white-paper-bucket-with-lid", assetPath("/images/generated/product-variants/provided/bio-white-paper-bucket-lid.webp")],
+  ["kraft-beverage-carrier", assetPath("/images/generated/product-variants/provided/bio-kraft-beverage-carrier.webp")],
+]);
 
 function isContainerShape(value: unknown): value is ContainerShape {
   return typeof value === "string" && shapeValues.has(value as ContainerShape);
@@ -80,6 +91,22 @@ function normalizeProductCategory(value: unknown, shape: ContainerShape) {
   return category || (shape === "tray" ? "Biodegradables" : "Plastic Containers");
 }
 
+function normalizeProductRange(value: unknown, legacyCategory: unknown, shape: ContainerShape) {
+  const productRange = String(value || "").trim();
+  if (/^(round|rectangular|rectangle|square|tray)$/i.test(productRange)) return "Plastic Food Containers";
+  if (/^custom$/i.test(productRange)) return "Custom Packaging";
+  if (productRange) return productRange;
+
+  const category = String(legacyCategory || "").trim();
+  if (/^(round|rectangular|rectangle|square|tray)$/i.test(category)) return "Plastic Food Containers";
+  if (/^custom$/i.test(category)) return "Custom Packaging";
+  if (/bio|kraft|paper|compost|eco/i.test(category)) return "Paper Packaging";
+
+  if (shape === "round" || shape === "tray" || shape === "square" || shape === "rectangular") return "Plastic Food Containers";
+
+  return undefined;
+}
+
 function normalizeAsset(value: unknown) {
   if (typeof value !== "string") {
     return null;
@@ -98,6 +125,7 @@ export function normalizeProduct(input: ProductInput): Product {
   const slug = toSlug(String(input.slug ?? name));
   const now = new Date().toISOString();
   const shape = isContainerShape(input.shape) ? input.shape : "rectangular";
+  const category = normalizeProductCategory(input.category, shape);
   const baseColor = isContainerColor(input.visual?.baseColor) ? input.visual.baseColor : "black";
   const visualCompartments = Number(input.visual?.compartments ?? input.compartments?.[0] ?? 1);
   const accent = accentValues.has(String(input.visual?.accent)) ? input.visual?.accent : "empty";
@@ -114,11 +142,13 @@ export function normalizeProduct(input: ProductInput): Product {
     id: String(input.id || `P-${slug.toUpperCase()}`).trim(),
     slug,
     name,
-    category: normalizeProductCategory(input.category, shape),
+    category,
+    productRange: normalizeProductRange(input.productRange, input.category, shape),
     shape,
     shortDescription: String(input.shortDescription || "").trim(),
     description: String(input.description || input.shortDescription || "").trim(),
     capacity: String(input.capacity || "Capacity range to be confirmed").trim(),
+    sizeOptions: normalizeStringArray(input.sizeOptions),
     dimensions: String(input.dimensions || "Specification pending").trim(),
     colourOptions: normalizeStringArray(input.colourOptions),
     lidOptions: normalizeStringArray(input.lidOptions),
@@ -177,10 +207,33 @@ function sortProducts(items: Product[]) {
 }
 
 function mergeStaticFallbackProducts(documents: Product[], fallback: Product[]) {
-  const documentSlugs = new Set(documents.map((product) => product.slug));
+  const fallbackBySlug = new Map(fallback.map((product) => [product.slug, product]));
+  const upgradedDocuments = documents.map((product) => {
+    const fallbackProduct = fallbackBySlug.get(product.slug);
+    const suppliedImage = suppliedProductVariantImages.get(product.slug);
+    const currentMedia = [product.image, ...product.gallery].filter(Boolean).join(" ");
+    const mergedProduct =
+      product.sizeOptions.length || !fallbackProduct?.sizeOptions.length
+        ? product
+        : {
+            ...product,
+            sizeOptions: fallbackProduct.sizeOptions,
+          };
+
+    if (!suppliedImage || (mergedProduct.image && !currentMedia.includes("/images/generated/product-variants/"))) {
+      return mergedProduct;
+    }
+
+    return {
+      ...mergedProduct,
+      image: suppliedImage,
+      gallery: [suppliedImage],
+    };
+  });
+  const documentSlugs = new Set(upgradedDocuments.map((product) => product.slug));
   const missingFallbacks = fallback.filter((product) => !documentSlugs.has(product.slug));
 
-  return sortProducts([...documents, ...missingFallbacks]);
+  return sortProducts([...upgradedDocuments, ...missingFallbacks]).filter((product) => !deprecatedProductSlugs.has(product.slug));
 }
 
 export async function syncStaticProductsToMongo() {
@@ -226,6 +279,7 @@ export async function getProducts(options: GetProductsOptions = {}) {
         isPublished: product.isPublished ?? true,
         order: product.order ?? index * 10,
       }))
+      .filter((product) => !deprecatedProductSlugs.has(product.slug))
       .filter((product) => options.includeDrafts || product.isPublished !== false),
   );
 
@@ -250,6 +304,10 @@ export async function getProducts(options: GetProductsOptions = {}) {
 }
 
 export async function getProductBySlug(slug: string, options: GetProductsOptions = {}) {
+  if (deprecatedProductSlugs.has(slug)) {
+    return undefined;
+  }
+
   try {
     const collection = await productCollection();
     if (!collection) {

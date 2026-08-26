@@ -14,7 +14,7 @@ export function TopHero({ settings = defaultHomeHero }: { settings?: HomeHeroSet
   const specs = settings.specs.length ? settings.specs : defaultHomeHero.specs;
 
   return (
-    <section className="top-hero" id="home">
+    <section className="top-hero">
       <div className="top-hero__shade" aria-hidden="true" />
       <div className="top-hero__content">
         <div className="top-hero__copy">
