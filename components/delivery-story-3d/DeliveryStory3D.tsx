@@ -10,7 +10,7 @@ import { StoryHud, StoryOverlay } from "@/components/delivery-story-3d/StoryOver
 import { beatIndexForProgress, mix, range, smoothRange, storyBeats } from "@/components/delivery-story-3d/storyProgress";
 import { assetPath } from "@/lib/assets";
 
-const scrollStoryQuery = "(min-width: 768px) and (prefers-reduced-motion: no-preference)";
+const scrollStoryQuery = "(prefers-reduced-motion: no-preference)";
 const deliverySceneryImage = assetPath("/scenery.png");
 const deliveryLocationImage = assetPath("/location.png");
 const deliveryScootyImage = assetPath("/scooty-grounded.png");
@@ -208,7 +208,13 @@ export function DeliveryStory3D() {
   );
 
   return (
-    <section className="delivery-3d" data-delivery-beat={activeIndex} id="home" ref={rootRef}>
+    <section
+      className="delivery-3d"
+      data-delivery-beat={activeIndex}
+      data-scroll-story={enableScrollStory ? "active" : "static"}
+      id="home"
+      ref={rootRef}
+    >
       <div className="delivery-3d__pin">
         <DeliveryCompositeLayers />
 

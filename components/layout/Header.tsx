@@ -46,8 +46,8 @@ export function Header() {
             className="site-nav__logo"
             height={500}
             priority
-            sizes="96px"
-            src="/images/Kanak%20Logo.png"
+            sizes="(max-width: 680px) 72px, 104px"
+            src="/Kanak%20Logo.png"
             width={500}
           />
         </Link>
@@ -63,12 +63,12 @@ export function Header() {
         </Link>
         <button
           aria-expanded={open}
-          aria-label="Open menu"
+          aria-label={open ? "Close menu" : "Open menu"}
           className="site-nav__menu"
-          onClick={() => setOpen(true)}
+          onClick={() => setOpen((current) => !current)}
           type="button"
         >
-          <Menu size={22} strokeWidth={1.7} />
+          <Menu size={25} strokeWidth={2} />
         </button>
       </header>
       <MobileMenu ctaLabel="Contact Us" links={links} onClose={() => setOpen(false)} open={open} />

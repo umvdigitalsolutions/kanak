@@ -52,7 +52,7 @@ function SlideEditor({ slide }: { slide?: HomeCarouselSlide }) {
       <div className="admin-form__grid admin-form__grid--simple">
         <label>
           Material
-          <input name="material" defaultValue={slide?.material ?? ""} placeholder="Food-grade PP / PET" />
+          <input name="material" defaultValue={slide?.material ?? ""} placeholder="Food-grade PP" />
         </label>
         <label>
           Best For

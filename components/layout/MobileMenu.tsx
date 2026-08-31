@@ -33,7 +33,15 @@ export function MobileMenu({ ctaLabel = "Contact Us", open, links, onClose }: Mo
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   return (
-    <div className={open ? "mobile-menu is-open" : "mobile-menu"} aria-hidden={!open}>
+    <>
+      <button
+        aria-label="Close menu"
+        className={open ? "mobile-menu__backdrop is-visible" : "mobile-menu__backdrop"}
+        onClick={onClose}
+        tabIndex={open ? 0 : -1}
+        type="button"
+      />
+      <div className={open ? "mobile-menu is-open" : "mobile-menu"} aria-hidden={!open}>
       <div className="mobile-menu__bar">
         <Link className="mobile-menu__brand" href="/" onClick={onClose} aria-label="Kanak Mouldings home">
           <Image alt="" height={500} sizes="72px" src="/images/Kanak%20Logo.png" width={500} />
@@ -76,6 +84,7 @@ export function MobileMenu({ ctaLabel = "Contact Us", open, links, onClose }: Mo
           </li>
         </ul>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,9 +1,14 @@
 import { assetPath } from "@/lib/assets";
-import { gujaratShopeeProducts } from "@/data/gujarat-shopee-products";
+import { biodegradableProducts } from "@/data/biodegradable-products";
 
 export type ContainerShape = "rectangular" | "round" | "square" | "tray";
 export type ContainerColor = "black" | "white" | "clear" | "custom";
 export type ProductCategoryName = "Plastic Containers" | "Biodegradables";
+
+export type ProductSpecification = {
+  label: string;
+  value: string;
+};
 
 export type Product = {
   id: string;
@@ -24,6 +29,7 @@ export type Product = {
   applications: string[];
   features: string[];
   customisation: string;
+  specifications?: ProductSpecification[];
   image: string | null;
   gallery: string[];
   featured: boolean;
@@ -512,7 +518,7 @@ const baseProducts: Product[] = [
   },
 ];
 
-export const products: Product[] = [...baseProducts, ...gujaratShopeeProducts];
+export const products: Product[] = [...baseProducts, ...biodegradableProducts];
 
 export const featuredProducts = products.filter((product) => product.featured);
 

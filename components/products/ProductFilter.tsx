@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  ArrowLeft,
+  ArrowUpRight,
   Box,
   CookingPot,
   CupSoda,
   Grid3X3,
   Layers3,
-  LayoutGrid,
   Package,
   Pizza,
   Rows3,
+  Search,
   ScrollText,
   Sandwich,
   Soup,
@@ -18,12 +20,11 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { productFilters, productRangeOrder, productsByFilter, type Product } from "@/data/products";
-import { ensureGsap } from "@/lib/animations";
 import { ProductCard } from "@/components/ui/ProductCard";
+import { ProductVisual } from "@/components/ui/ProductVisual";
+import { productDisplayImage } from "@/lib/product-visual-assets";
 
-const allRangeLabel = "All Product Categories";
 const rangeIcons: Record<string, LucideIcon> = {
-  [allRangeLabel]: LayoutGrid,
   "Plastic Food Containers": Package,
   "Custom Packaging": Layers3,
   "Paper Bowl": Soup,
@@ -40,30 +41,6 @@ const rangeIcons: Record<string, LucideIcon> = {
   "Food Tray": Rows3,
 };
 
-function ProductCategoryButton({
-  count,
-  isSelected,
-  label,
-  onClick,
-}: {
-  count: number;
-  isSelected: boolean;
-  label: string;
-  onClick: () => void;
-}) {
-  const Icon = rangeIcons[label] ?? Package;
-
-  return (
-    <button aria-pressed={isSelected} className={isSelected ? "is-selected" : ""} onClick={onClick} type="button">
-      <span className="product-category-columns__icon" aria-hidden="true">
-        <Icon size={20} strokeWidth={1.8} />
-      </span>
-      <span className="product-category-columns__label">{label}</span>
-      <strong>{count.toString().padStart(2, "0")}</strong>
-    </button>
-  );
-}
-
 export function ProductFilter({
   categories,
   initialFilter = productFilters[0],
@@ -78,13 +55,13 @@ export function ProductFilter({
     [categories, products],
   );
   const [filter, setFilter] = useState<string>(() => (filters.includes(initialFilter) ? initialFilter : productFilters[0]));
-  const [productRange, setProductRange] = useState(allRangeLabel);
-  const gridRef = useRef<HTMLDivElement>(null);
+  const [productRange, setProductRange] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
   const categoryProducts = useMemo(() => productsByFilter(filter, products), [filter, products]);
   const productRanges = useMemo(() => {
     const ranges = [...new Set(categoryProducts.map((product) => product.productRange).filter(Boolean) as string[])];
 
-    return ranges.sort((a, b) => {
+    return ranges.filter((range) => productRangeOrder.includes(range as (typeof productRangeOrder)[number])).sort((a, b) => {
       const aIndex = productRangeOrder.indexOf(a as (typeof productRangeOrder)[number]);
       const bIndex = productRangeOrder.indexOf(b as (typeof productRangeOrder)[number]);
 
@@ -94,20 +71,35 @@ export function ProductFilter({
       return aIndex - bIndex;
     });
   }, [categoryProducts]);
-  const productRangeCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-
-    for (const product of categoryProducts) {
-      if (!product.productRange) continue;
-      counts.set(product.productRange, (counts.get(product.productRange) ?? 0) + 1);
-    }
-
-    return counts;
-  }, [categoryProducts]);
-  const visibleProducts = useMemo(() => {
-    if (productRange === allRangeLabel) return categoryProducts;
+  const rangeProducts = useMemo(() => {
+    if (!productRange) return [];
     return categoryProducts.filter((product) => product.productRange === productRange);
   }, [categoryProducts, productRange]);
+  const visibleProducts = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) return rangeProducts;
+
+    return rangeProducts.filter((product) =>
+      [product.name, product.capacity, product.material, ...product.sizeOptions]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalizedQuery),
+    );
+  }, [query, rangeProducts]);
+  const productRangeSummaries = useMemo(
+    () =>
+      productRanges.map((range) => {
+        const rangeProducts = categoryProducts.filter((product) => product.productRange === range);
+        const representative = rangeProducts.find((product) => product.image) ?? rangeProducts[0];
+
+        return {
+          count: rangeProducts.length,
+          range,
+          representative,
+        };
+      }),
+    [categoryProducts, productRanges],
+  );
 
   useEffect(() => {
     const applyFilterFromUrl = () => {
@@ -115,7 +107,8 @@ export function ProductFilter({
 
       if (requestedFilter && filters.includes(requestedFilter)) {
         setFilter(requestedFilter);
-        setProductRange(allRangeLabel);
+        setProductRange(null);
+        setQuery("");
       }
     };
 
@@ -142,51 +135,18 @@ export function ProductFilter({
     };
   }, [filters]);
 
-  useEffect(() => {
-    const grid = gridRef.current;
-    if (!grid) return;
-
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) return;
-
-    const { gsap } = ensureGsap();
-    const cards = Array.from(grid.querySelectorAll<HTMLElement>(".product-card"));
-    const visuals = cards
-      .map((card) => card.querySelector<HTMLElement>(".product-card__visual"))
-      .filter(Boolean) as HTMLElement[];
-
-    const context = gsap.context(() => {
-      gsap.fromTo(
-        cards,
-        { autoAlpha: 0, scale: 0.965, y: 34 },
-        {
-          autoAlpha: 1,
-          duration: 0.58,
-          ease: "power3.out",
-          scale: 1,
-          stagger: { each: 0.07, from: "start", grid: "auto" },
-          y: 0,
-        },
-      );
-
-      gsap.fromTo(
-        visuals,
-        { scale: 1.06, y: 18 },
-        { duration: 0.7, ease: "power3.out", scale: 1, stagger: 0.07, y: 0 },
-      );
-    }, grid);
-
-    return () => context.revert();
-  }, [filter, productRange]);
-
   return (
     <div className="products-browser">
       <div className="products-browser__bar" aria-live="polite">
         <div>
-          <span>Showing</span>
-          <strong>{visibleProducts.length.toString().padStart(2, "0")}</strong>
+          <span>{productRange ? "Products" : "Categories"}</span>
+          <strong>{(productRange ? visibleProducts.length : productRanges.length).toString().padStart(2, "0")}</strong>
         </div>
-        <p>{productRange === allRangeLabel ? `${filter} range` : `${filter} / ${productRange}`} for bulk packaging enquiries.</p>
+        <p>
+          {productRange
+            ? `${filter} / ${productRange} complete range.`
+            : `Complete ${filter.toLowerCase()} ranges for bulk packaging enquiries.`}
+        </p>
       </div>
       <div className="filter-row filter-row--primary" aria-label="Product ranges">
         {filters.map((item) => (
@@ -196,7 +156,8 @@ export function ProductFilter({
             key={item}
             onClick={() => {
               setFilter(item);
-              setProductRange(allRangeLabel);
+              setProductRange(null);
+              setQuery("");
             }}
             type="button"
           >
@@ -204,35 +165,104 @@ export function ProductFilter({
           </button>
         ))}
       </div>
-      {productRanges.length ? (
-        <div className="product-range-panel">
-          <div className="product-range-panel__head">
-            <span>Product Category Range</span>
-            <strong>{productRanges.length.toString().padStart(2, "0")}</strong>
+      <div className="products-browser__content">
+        {!productRange ? (
+          <div className="product-category-overview">
+            <div className="product-category-overview__head">
+              <div>
+                <p className="kicker">Product Category Range</p>
+                <h2>{filter}</h2>
+              </div>
+              <span>{productRanges.length.toString().padStart(2, "0")} category families</span>
+            </div>
+            <div className="product-category-grid" aria-label={`${filter} product categories`}>
+              {productRangeSummaries.map(({ count, range, representative }) => {
+                if (!representative) return null;
+
+                const Icon = rangeIcons[range] ?? Package;
+
+                return (
+                  <button
+                    aria-label={`Open ${range} category with ${count} products`}
+                    className="product-category-card"
+                    key={range}
+                    onClick={() => {
+                      setProductRange(range);
+                      setQuery("");
+                    }}
+                    type="button"
+                  >
+                    <span className="product-category-card__visual">
+                      <ProductVisual
+                        accent={representative.visual.accent}
+                        alt={range}
+                        baseColor={representative.visual.baseColor}
+                        compartments={representative.visual.compartments}
+                        image={productDisplayImage(representative)}
+                        lid={representative.visual.lid}
+                        shape={representative.shape}
+                      />
+                    </span>
+                    <span className="product-category-card__body">
+                      <span className="product-category-card__kicker">
+                        <Icon aria-hidden="true" size={17} strokeWidth={1.8} />
+                        {filter}
+                      </span>
+                      <strong>{range}</strong>
+                      <span>{count.toString().padStart(2, "0")} products in this range</span>
+                    </span>
+                    <span className="product-category-card__arrow" aria-hidden="true">
+                      <ArrowUpRight size={19} strokeWidth={1.8} />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <div className="product-category-columns" aria-label={`${filter} product category range`}>
-            <ProductCategoryButton
-              count={categoryProducts.length}
-              isSelected={productRange === allRangeLabel}
-              label={allRangeLabel}
-              onClick={() => setProductRange(allRangeLabel)}
-            />
-            {productRanges.map((item) => (
-              <ProductCategoryButton
-                count={productRangeCounts.get(item) ?? 0}
-                isSelected={productRange === item}
-                key={item}
-                label={item}
-                onClick={() => setProductRange(item)}
-              />
-            ))}
+        ) : (
+          <div className="product-range-results">
+            <div className="product-range-results__head">
+              <button
+                onClick={() => {
+                  setProductRange(null);
+                  setQuery("");
+                }}
+                type="button"
+              >
+                <ArrowLeft size={18} strokeWidth={1.8} />
+                All categories
+              </button>
+              <div className="product-range-results__title">
+                <p className="kicker">{filter}</p>
+                <h2>{productRange}</h2>
+                <span>{rangeProducts.length.toString().padStart(2, "0")} available products</span>
+              </div>
+              <label className="product-range-search">
+                <Search aria-hidden="true" size={18} strokeWidth={1.8} />
+                <input
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder={`Search ${productRange}`}
+                  type="search"
+                  value={query}
+                />
+                <small>{visibleProducts.length.toString().padStart(2, "0")} shown</small>
+              </label>
+            </div>
+            {visibleProducts.length ? (
+              <div className="product-grid product-grid--wide">
+                {visibleProducts.map((product) => (
+                  <ProductCard compact key={product.slug} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="product-range-empty">
+                <Search aria-hidden="true" size={24} strokeWidth={1.7} />
+                <strong>No matching products</strong>
+                <p>Try another size, material or product name.</p>
+              </div>
+            )}
           </div>
-        </div>
-      ) : null}
-      <div className="product-grid product-grid--wide product-grid--gsap" ref={gridRef}>
-        {visibleProducts.map((product) => (
-          <ProductCard key={product.slug} product={product} />
-        ))}
+        )}
       </div>
     </div>
   );

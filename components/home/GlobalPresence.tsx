@@ -9,60 +9,20 @@ import {
   indiaStates,
   usaSize,
   usaStates,
-  type MapRegion,
 } from "@/data/maps";
 
-/** Seconds the beam takes to cross a map. Must match --sweep-window in globals.css. */
-const SWEEP_SECONDS = 3.2;
-/** Beam width as a share of the map's own coordinate space. */
-const BEAM_RATIO = 0.06;
+const usaCoverageStates = usaStates.filter((state) => state.name !== "District of Columbia");
 
-type MapSize = { width: number; height: number };
-
-function flareDelay(state: MapRegion): CSSProperties {
-  return { animationDelay: `${(state.sweep * SWEEP_SECONDS).toFixed(2)}s` };
-}
-
-/**
- * The beam lives inside the SVG so it shares the states' coordinate space —
- * letterboxing then cannot drift the sweep out of step with the flares.
- */
-function LaserBeam({ id, size }: { id: string; size: MapSize }) {
-  const width = Math.round(size.width * BEAM_RATIO);
-  const style = {
-    "--beam-width": `${width}px`,
-    "--map-width": `${size.width}px`,
-  } as CSSProperties;
-
-  return (
-    <>
-      <defs>
-        <linearGradient id={id} x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stopColor="#35e2ff" stopOpacity="0" />
-          <stop offset="72%" stopColor="#35e2ff" stopOpacity="0.22" />
-          <stop offset="93%" stopColor="#7ef0ff" stopOpacity="0.6" />
-          <stop offset="99%" stopColor="#eafcff" stopOpacity="1" />
-          <stop offset="100%" stopColor="#eafcff" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <rect
-        className="presence-map__beam"
-        fill={`url(#${id})`}
-        height={size.height}
-        style={style}
-        width={width}
-        x={-width}
-        y={0}
-      />
-    </>
-  );
+function progressStyle(index: number, total: number): CSSProperties {
+  return { "--network-progress": `${((index + 1) / total) * 100}%` } as CSSProperties;
 }
 
 export function GlobalPresence() {
   const root = useRef<HTMLElement>(null);
-  // Gates the sweep so it starts when the maps scroll into view. Without the
-  // observer the maps stay in their static lit state, which reads fine on its own.
+  // Start map motion only once the section has entered the viewport.
   const [visible, setVisible] = useState(false);
+  const [activeIndiaState, setActiveIndiaState] = useState(0);
+  const [activeUsaState, setActiveUsaState] = useState(0);
 
   useEffect(() => {
     const node = root.current;
@@ -82,19 +42,34 @@ export function GlobalPresence() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (!visible || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const timer = window.setInterval(() => {
+      setActiveIndiaState((current) => (current + 1) % indiaStates.length);
+      setActiveUsaState((current) => (current + 1) % usaCoverageStates.length);
+    }, 1050);
+
+    return () => window.clearInterval(timer);
+  }, [visible]);
+
+  const activeIndiaRegion = indiaStates[activeIndiaState];
+  const activeUsaRegion = usaCoverageStates[activeUsaState];
+
   return (
     <section className={visible ? "presence-section is-visible" : "presence-section"} ref={root}>
       <Container>
         <div className="presence-section__head">
           <p className="kicker">Domestic and international presence</p>
           <h2>
-            PAN-INDIA SUPPLY,
+            PAN INDIA.
             <br />
-            EXPORTING TO THE USA.
+            ENTIRE USA.
+            <br />
+            ONE NETWORK.
           </h2>
           <p className="section-copy">
-            Our containers reach kitchens and brands across every region of India, and travel onward to customers in
-            the United States.
+            Nationwide domestic coverage connects with an international supply network spanning the United States.
           </p>
         </div>
 
@@ -105,33 +80,79 @@ export function GlobalPresence() {
                 <MapPin aria-hidden="true" size={15} strokeWidth={2.1} />
                 India
               </span>
-              <span className="presence-card__meta">Domestic supply</span>
+              <span aria-live="polite" className="presence-card__meta">
+                PAN India
+              </span>
             </header>
 
             <div className="presence-map">
               <svg
-                aria-label="Map of India with every state and union territory marked"
+                aria-label={`Digital map of India connecting to ${activeIndiaRegion.name}`}
                 role="img"
                 viewBox={`0 0 ${indiaSize.width} ${indiaSize.height}`}
               >
-                <LaserBeam id="beam-india" size={indiaSize} />
                 <path className="presence-map__outline" d={indiaOutline} />
                 <g className="presence-map__regions">
-                  {indiaStates.map((state) => (
-                    <path className="presence-map__region" d={state.d} key={state.name} style={flareDelay(state)} />
+                  {indiaStates.map((state, index) => (
+                    <path
+                      className={`presence-map__region presence-map__region--india${index <= activeIndiaState ? " is-scanned" : ""}${state.name === activeIndiaRegion.name ? " is-active" : ""}`}
+                      d={state.d}
+                      key={state.name}
+                    >
+                      <title>{state.name}</title>
+                    </path>
                   ))}
+                </g>
+                <g className="presence-map__network">
+                  {indiaStates.map((state, index) => (
+                    <circle
+                      className={`presence-map__node${index <= activeIndiaState ? " is-scanned" : ""}${state.name === activeIndiaRegion.name ? " is-active" : ""}`}
+                      cx={state.cx}
+                      cy={state.cy}
+                      key={`india-node-${state.name}`}
+                      r="3.2"
+                    />
+                  ))}
+                  <g
+                    className="presence-map__beacon"
+                    key={`india-beacon-${activeIndiaRegion.name}`}
+                    transform={`translate(${activeIndiaRegion.cx} ${activeIndiaRegion.cy})`}
+                  >
+                    <circle className="presence-map__beacon-ring presence-map__beacon-ring--outer" r="22" />
+                    <circle className="presence-map__beacon-ring presence-map__beacon-ring--inner" r="12" />
+                    <line x1="-24" x2="-10" y1="0" y2="0" />
+                    <line x1="10" x2="24" y1="0" y2="0" />
+                    <line x1="0" x2="0" y1="-24" y2="-10" />
+                    <line x1="0" x2="0" y1="10" y2="24" />
+                    <circle className="presence-map__beacon-core" r="4.5" />
+                  </g>
                 </g>
               </svg>
               <span aria-hidden="true" className="presence-map__scanlines" />
             </div>
 
+            <div
+              aria-live="polite"
+              className="presence-network-status"
+              style={progressStyle(activeIndiaState, indiaStates.length)}
+            >
+              <div>
+                <span>Active location</span>
+                <strong>{activeIndiaRegion.name}</strong>
+              </div>
+              <b>
+                {String(activeIndiaState + 1).padStart(2, "0")} / {indiaStates.length}
+              </b>
+              <i aria-hidden="true"><span /></i>
+            </div>
+
             <div className="presence-coverage">
-              <strong>28 states + 8 UTs</strong>
-              <span>Supplying across every region of the country</span>
+              <strong>PAN India coverage</strong>
+              <span>States and union territories connected nationwide</span>
             </div>
 
             <p className="presence-card__note">
-              Domestic network across <strong>all of India</strong>
+              Domestic service network across <strong>India</strong>
             </p>
           </article>
 
@@ -141,7 +162,7 @@ export function GlobalPresence() {
                 <Globe2 aria-hidden="true" size={15} strokeWidth={2.1} />
                 United States
               </span>
-              <span className="presence-card__meta">Export supply</span>
+              <span className="presence-card__meta">Entire USA</span>
             </header>
 
             <div className="presence-map">
@@ -150,18 +171,67 @@ export function GlobalPresence() {
                 role="img"
                 viewBox={`0 0 ${usaSize.width} ${usaSize.height}`}
               >
-                <LaserBeam id="beam-usa" size={usaSize} />
                 <g className="presence-map__regions">
-                  {usaStates.map((state) => (
-                    <path className="presence-map__region" d={state.d} key={state.name} style={flareDelay(state)} />
+                  {usaStates.map((state) => {
+                    const coverageIndex = usaCoverageStates.findIndex((item) => item.name === state.name);
+                    const isScanned = coverageIndex >= 0 && coverageIndex <= activeUsaState;
+
+                    return (
+                      <path
+                        className={`presence-map__region presence-map__region--usa${isScanned ? " is-scanned" : ""}${state.name === activeUsaRegion.name ? " is-active" : ""}`}
+                        d={state.d}
+                        key={state.name}
+                      >
+                        <title>{state.name}</title>
+                      </path>
+                    );
+                  })}
+                </g>
+                <g className="presence-map__network">
+                  {usaCoverageStates.map((state, index) => (
+                    <circle
+                      className={`presence-map__node${index <= activeUsaState ? " is-scanned" : ""}${state.name === activeUsaRegion.name ? " is-active" : ""}`}
+                      cx={state.cx}
+                      cy={state.cy}
+                      key={`usa-node-${state.name}`}
+                      r="2.7"
+                    />
                   ))}
+                  <g
+                    className="presence-map__beacon"
+                    key={`usa-beacon-${activeUsaRegion.name}`}
+                    transform={`translate(${activeUsaRegion.cx} ${activeUsaRegion.cy})`}
+                  >
+                    <circle className="presence-map__beacon-ring presence-map__beacon-ring--outer" r="20" />
+                    <circle className="presence-map__beacon-ring presence-map__beacon-ring--inner" r="10" />
+                    <line x1="-22" x2="-9" y1="0" y2="0" />
+                    <line x1="9" x2="22" y1="0" y2="0" />
+                    <line x1="0" x2="0" y1="-22" y2="-9" />
+                    <line x1="0" x2="0" y1="9" y2="22" />
+                    <circle className="presence-map__beacon-core" r="4" />
+                  </g>
                 </g>
               </svg>
               <span aria-hidden="true" className="presence-map__scanlines" />
             </div>
 
+            <div
+              aria-live="polite"
+              className="presence-network-status"
+              style={progressStyle(activeUsaState, usaCoverageStates.length)}
+            >
+              <div>
+                <span>Active location</span>
+                <strong>{activeUsaRegion.name}</strong>
+              </div>
+              <b>
+                {String(activeUsaState + 1).padStart(2, "0")} / {usaCoverageStates.length}
+              </b>
+              <i aria-hidden="true"><span /></i>
+            </div>
+
             <div className="presence-coverage">
-              <strong>All 50 states</strong>
+              <strong>Entire USA coverage</strong>
               <span>Coast to coast, including Alaska and Hawaii</span>
             </div>
 

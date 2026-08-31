@@ -5,14 +5,15 @@ import { ProductVisual } from "@/components/ui/ProductVisual";
 import { productDisplayImage } from "@/lib/product-visual-assets";
 
 type ProductCardProps = {
+  compact?: boolean;
   product: Product;
 };
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ compact = false, product }: ProductCardProps) {
   const sizeOptions = product.sizeOptions ?? [];
 
   return (
-    <article className="product-card group">
+    <article className={compact ? "product-card product-card--compact group" : "product-card group"}>
       <Link className="product-card__link" href={`/products/${product.slug}`}>
         <div className="product-card__visual">
           <ProductVisual
@@ -28,7 +29,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="product-card__body">
           <p className="kicker">{product.productRange ? `${product.category} / ${product.productRange}` : product.category}</p>
           <h3>{product.name}</h3>
-          <p>{product.shortDescription}</p>
+          {compact ? null : <p>{product.shortDescription}</p>}
         </div>
         <span className="product-card__arrow" aria-hidden="true">
           <ArrowUpRight size={18} strokeWidth={1.7} />

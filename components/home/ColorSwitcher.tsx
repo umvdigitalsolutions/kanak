@@ -1,54 +1,62 @@
-"use client";
-
-import { useState } from "react";
-import type { ContainerColor } from "@/data/products";
+import { Award, BadgeCheck, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { ProductPhotoScene } from "@/components/ui/ProductPhotoScene";
 
-const colors: { value: ContainerColor; label: string }[] = [
-  { value: "black", label: "Black" },
-  { value: "white", label: "White" },
-  { value: "clear", label: "Clear" },
-  { value: "custom", label: "Custom" },
+const certificates = [
+  { icon: BadgeCheck, label: "Food safety", name: "FSSAI", detail: "Food-grade packaging aligned with responsible food handling requirements." },
+  { icon: Award, label: "Quality system", name: "ISO 9001", detail: "A quality-led approach to consistent manufacturing and customer supply." },
+  { icon: ShieldCheck, label: "Company compliance", name: "FDI", detail: "A compliant business foundation supporting dependable long-term partnerships." },
 ];
 
-export function ColorSwitcher() {
-  const [color, setColor] = useState<ContainerColor>("black");
+function CertificateCard({ certificate }: { certificate: (typeof certificates)[number] }) {
+  const Icon = certificate.icon;
 
   return (
-    <section className="color-section">
-      <Container className="color-section__grid">
+    <article className="certificate-card">
+      <div className="certificate-card__head">
+        <span>Kanak Mouldings</span>
+        <span>Certificate</span>
+      </div>
+      <div className="certificate-card__body">
+        <div className="certificate-card__seal">
+          <Icon aria-hidden="true" size={31} strokeWidth={1.65} />
+          <span>Certified</span>
+        </div>
         <div>
-          <p className="kicker">Material look</p>
+          <p className="certificate-card__type">{certificate.label}</p>
+          <strong>{certificate.name}</strong>
+          <p className="certificate-card__detail">{certificate.detail}</p>
+        </div>
+      </div>
+      <div className="certificate-card__foot">
+        <span>Packaging compliance</span>
+        <i aria-hidden="true" />
+        <span>Kanak Mouldings</span>
+      </div>
+    </article>
+  );
+}
+
+export function ColorSwitcher() {
+  return (
+    <section className="certificate-section">
+      <Container className="certificate-section__grid">
+        <div>
+          <p className="kicker">Certified to deliver</p>
           <h2>
-            ONE PACK.
+            QUALITY YOU
             <br />
-            DIFFERENT FINISHES.
+            CAN VERIFY.
           </h2>
           <p>
-            Review common black, white, transparent and custom finish directions
-            before confirming material grade, lid type and order requirements.
+            Kanak Mouldings builds every partnership on food safety, consistent
+            quality and a compliant business foundation.
           </p>
-          <div className="swatch-row">
-            {colors.map((item) => (
-              <button
-                aria-label={`Switch to ${item.label}`}
-                aria-pressed={color === item.value}
-                className={`swatch swatch--${item.value} ${color === item.value ? "is-selected" : ""}`}
-                key={item.value}
-                onClick={() => setColor(item.value)}
-                type="button"
-              />
-            ))}
-          </div>
         </div>
-        <ProductPhotoScene
-          badges={[`${colors.find((item) => item.value === color)?.label ?? "Custom"} finish`, "Lid direction", "Food-grade application"]}
-          caption="Finish planning preview for container quotation and material discussion."
-          eyebrow="Material finish preview"
-          smoke
-          tone={color}
-        />
+        <div className="certificate-section__cards">
+          {certificates.map((certificate) => (
+            <CertificateCard certificate={certificate} key={certificate.name} />
+          ))}
+        </div>
       </Container>
     </section>
   );

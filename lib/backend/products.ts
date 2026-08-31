@@ -73,6 +73,19 @@ function normalizeNumberArray(value: unknown) {
     .filter((item) => Number.isFinite(item) && item > 0);
 }
 
+function normalizeSpecifications(value: unknown) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const label = String("label" in item ? item.label : "").trim();
+      const specificationValue = String("value" in item ? item.value : "").trim();
+      return label && specificationValue ? { label, value: specificationValue } : null;
+    })
+    .filter((item): item is { label: string; value: string } => Boolean(item));
+}
+
 function normalizeProductCategory(value: unknown, shape: ContainerShape) {
   const category = String(value || "").trim();
 
@@ -157,6 +170,7 @@ export function normalizeProduct(input: ProductInput): Product {
     applications: normalizeStringArray(input.applications),
     features: normalizeStringArray(input.features),
     customisation: String(input.customisation || "").trim(),
+    specifications: normalizeSpecifications(input.specifications),
     image: normalizeAsset(input.image),
     gallery: normalizeGallery(input.gallery),
     featured: Boolean(input.featured),
@@ -212,13 +226,24 @@ function mergeStaticFallbackProducts(documents: Product[], fallback: Product[]) 
     const fallbackProduct = fallbackBySlug.get(product.slug);
     const suppliedImage = suppliedProductVariantImages.get(product.slug);
     const currentMedia = [product.image, ...product.gallery].filter(Boolean).join(" ");
-    const mergedProduct =
+    let mergedProduct =
       product.sizeOptions.length || !fallbackProduct?.sizeOptions.length
         ? product
         : {
             ...product,
             sizeOptions: fallbackProduct.sizeOptions,
           };
+
+    if (fallbackProduct?.id.startsWith("KM-BIO-")) {
+      mergedProduct = {
+        ...product,
+        ...fallbackProduct,
+        isPublished: product.isPublished,
+        order: product.order,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+      };
+    }
 
     if (!suppliedImage || (mergedProduct.image && !currentMedia.includes("/images/generated/product-variants/"))) {
       return mergedProduct;
@@ -232,8 +257,21 @@ function mergeStaticFallbackProducts(documents: Product[], fallback: Product[]) 
   });
   const documentSlugs = new Set(upgradedDocuments.map((product) => product.slug));
   const missingFallbacks = fallback.filter((product) => !documentSlugs.has(product.slug));
+  const fallbackSlugs = new Set(fallback.map((product) => product.slug));
+  const productsByName = new Map<string, Product>();
 
-  return sortProducts([...upgradedDocuments, ...missingFallbacks]).filter((product) => !deprecatedProductSlugs.has(product.slug));
+  for (const product of [...upgradedDocuments, ...missingFallbacks]) {
+    const key = product.name.replace(/\s+/g, " ").trim().toLowerCase();
+    const current = productsByName.get(key);
+
+    if (!current || (fallbackSlugs.has(product.slug) && !fallbackSlugs.has(current.slug))) {
+      productsByName.set(key, product);
+    }
+  }
+
+  return sortProducts(Array.from(productsByName.values())).filter(
+    (product) => !deprecatedProductSlugs.has(product.slug),
+  );
 }
 
 export async function syncStaticProductsToMongo() {
@@ -316,7 +354,21 @@ export async function getProductBySlug(slug: string, options: GetProductsOptions
 
     await seedProductsIfEmpty(collection);
     const document = await collection.findOne({ slug, ...publicFilter(options.includeDrafts) });
-    return document ? serializeProduct(document) : seedProducts.find((product) => product.slug === slug);
+    const fallbackProduct = seedProducts.find((product) => product.slug === slug);
+
+    if (!document) return fallbackProduct;
+
+    const product = serializeProduct(document);
+    if (!fallbackProduct?.id.startsWith("KM-BIO-")) return product;
+
+    return {
+      ...product,
+      ...fallbackProduct,
+      isPublished: product.isPublished,
+      order: product.order,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+    };
   } catch (error) {
     logBackendError("Product database read failed. Falling back to static product", error);
     return seedProducts.find((product) => product.slug === slug);

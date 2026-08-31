@@ -85,11 +85,28 @@ export function normalizeCarouselSlide(input: HomeCarouselSlideInput): HomeCarou
 
 function normalizeSiteSettings(input: Partial<SiteSettings> = {}): SiteSettings {
   const slides = Array.isArray(input.containerSlides) && input.containerSlides.length ? input.containerSlides : defaultContainerSlides;
+  const foodWrappingSlide = defaultContainerSlides.find((slide) => slide.id === "food-wrapping-sheets");
+  const friesTraySlide = defaultContainerSlides.find((slide) => slide.id === "kraft-fries-tray");
+  const normalizedSlides = slides.map((slide) => {
+    if (slide.id === "clear-deli" && foodWrappingSlide) {
+      return { ...foodWrappingSlide, order: slide.order, isPublished: slide.isPublished };
+    }
+
+    if ((slide.id === "biodegradable-clamshell" || slide.id === "kraft-fries-tray") && friesTraySlide) {
+      return { ...friesTraySlide, order: slide.order, isPublished: slide.isPublished };
+    }
+
+    if (slide.id === "round-plastic") {
+      return { ...slide, material: "Food-grade PP" };
+    }
+
+    return slide;
+  });
 
   return {
     id: "home",
     hero: normalizeHomeHero(input.hero),
-    containerSlides: slides
+    containerSlides: normalizedSlides
       .map((slide, index) => normalizeCarouselSlide({ ...slide, order: slide.order ?? index * 10 }))
       .sort((a, b) => (a.order ?? 100) - (b.order ?? 100)),
     updatedAt: input.updatedAt,
