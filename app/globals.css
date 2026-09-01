@@ -4722,6 +4722,104 @@ button:hover .button-arrow {
   }
 }
 
+/* ---- Direct contact rows (footer + contact page) ---- */
+
+.footer__contact {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer__contact li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.6rem;
+  color: rgba(255, 253, 247, 0.62);
+  font-size: 0.9rem;
+}
+
+.footer__contact svg {
+  color: var(--ember);
+}
+
+.footer__contact a {
+  color: inherit;
+  transition: color 180ms ease;
+}
+
+.footer__contact a:hover {
+  color: var(--porcelain);
+}
+
+.contact-direct {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.7rem;
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-direct a {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.7rem;
+  height: 100%;
+  border: 1px solid rgba(6, 74, 43, 0.16);
+  border-radius: 10px;
+  padding: 0.8rem 0.9rem;
+  background: rgba(255, 255, 255, 0.55);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.contact-direct a:hover {
+  border-color: var(--sage);
+  background: rgba(0, 139, 68, 0.06);
+  transform: translateY(-1px);
+}
+
+.contact-direct__icon {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(0, 139, 68, 0.1);
+  color: var(--sage);
+}
+
+.contact-direct--whatsapp .contact-direct__icon {
+  background: rgba(37, 211, 102, 0.14);
+  color: #128c4a;
+}
+
+.contact-direct strong {
+  display: block;
+  color: var(--charcoal);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.contact-direct small {
+  display: block;
+  margin-top: 0.1rem;
+  color: var(--text-grey);
+  font-size: 0.76rem;
+}
+
+@media (max-width: 560px) {
+  .contact-direct {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ============================================================
    Quote form
    ============================================================ */

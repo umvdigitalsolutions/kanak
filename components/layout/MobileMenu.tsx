@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, Mail, MapPin, X } from "lucide-react";
+import { ArrowUpRight, Mail, MapPin, Phone, X } from "lucide-react";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { company } from "@/data/company";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
 
 type MobileMenuProps = {
   open: boolean;
@@ -74,6 +75,16 @@ export function MobileMenu({ ctaLabel = "Contact Us", open, links, onClose }: Mo
           <ArrowUpRight aria-hidden="true" size={16} strokeWidth={2} />
         </Link>
         <ul className="mobile-menu__contact">
+          <li>
+            <Phone aria-hidden="true" size={14} strokeWidth={1.8} />
+            <a href={company.phoneHref}>{company.phone}</a>
+          </li>
+          <li>
+            <WhatsAppIcon size={14} />
+            <a href={company.whatsappHref} rel="noopener noreferrer" target="_blank">
+              WhatsApp us
+            </a>
+          </li>
           <li>
             <Mail aria-hidden="true" size={14} strokeWidth={1.8} />
             <a href={`mailto:${company.email}`}>{company.email}</a>

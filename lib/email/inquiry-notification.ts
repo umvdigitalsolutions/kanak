@@ -5,7 +5,7 @@ export type InquiryNotificationResult =
   | { sent: true; id: string | null }
   | { sent: false; skipped: true; reason: "not_configured" };
 
-const defaultRecipient = "admin@kanakmoulding.com";
+const defaultRecipient = "info@kanakmouldings.co.in";
 
 function escapeHtml(value: string) {
   return value

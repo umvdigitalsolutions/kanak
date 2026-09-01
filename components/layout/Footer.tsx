@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { company } from "@/data/company";
 import { Container } from "@/components/ui/Container";
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
 
 const links = [
   ["Home", "/"],
@@ -33,9 +35,26 @@ export function Footer() {
           </nav>
           <div>
             <p className="footer__label">Quotation Desk</p>
-            <p>{company.phone}</p>
-            <p>{company.email}</p>
-            <p>{company.address}</p>
+            <ul className="footer__contact">
+              <li>
+                <Phone aria-hidden="true" size={15} strokeWidth={1.8} />
+                <a href={company.phoneHref}>{company.phone}</a>
+              </li>
+              <li>
+                <WhatsAppIcon size={15} />
+                <a href={company.whatsappHref} rel="noopener noreferrer" target="_blank">
+                  WhatsApp us
+                </a>
+              </li>
+              <li>
+                <Mail aria-hidden="true" size={15} strokeWidth={1.8} />
+                <a href={`mailto:${company.email}`}>{company.email}</a>
+              </li>
+              <li>
+                <MapPin aria-hidden="true" size={15} strokeWidth={1.8} />
+                <span>{company.address}</span>
+              </li>
+            </ul>
           </div>
         </div>
         <div className="footer__bottom">

@@ -1,3 +1,4 @@
+import { company } from "@/data/company";
 import { isAdminAuthenticated } from "@/lib/admin/auth";
 import { databaseAwareMessage, databaseAwareStatus, logBackendError } from "@/lib/backend/errors";
 import { getInquiries, validateInquiryInput } from "@/lib/backend/inquiries";
@@ -7,7 +8,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const undeliveredMessage =
-  "We could not send your enquiry right now. Please try again, or reach us directly at admin@kanakmoulding.com.";
+  `We could not send your enquiry right now. Please try again, or reach us directly at ${company.email} or ${company.phone}.`;
 
 function jsonError(message: string, status = 500, errors?: Record<string, string>) {
   return Response.json({ ok: false, message, errors }, { status });
