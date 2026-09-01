@@ -1,0 +1,183 @@
+:global(html.site-is-loading),
+:global(html.site-is-loading body) {
+  overflow: hidden;
+}
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--porcelain);
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 420ms ease,
+    visibility 420ms ease;
+}
+
+.preloader::before,
+.preloader::after {
+  position: absolute;
+  width: min(24vw, 13rem);
+  height: 1px;
+  background: rgba(0, 139, 68, 0.2);
+  transform: scaleX(0);
+  content: "";
+}
+
+.preloader::before {
+  top: clamp(2rem, 8vh, 5rem);
+  left: 0;
+  transform-origin: left center;
+  animation: edge-line 720ms 100ms ease-out both;
+}
+
+.preloader::after {
+  right: 0;
+  bottom: clamp(2rem, 8vh, 5rem);
+  transform-origin: right center;
+  animation: edge-line 720ms 180ms ease-out both;
+}
+
+.leaving {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.mark {
+  position: relative;
+  z-index: 0;
+  width: clamp(11rem, 18vw, 14.5rem);
+  aspect-ratio: 1;
+}
+
+.mark::before,
+.mark::after {
+  position: absolute;
+  z-index: -1;
+  width: clamp(1.8rem, 4vw, 2.6rem);
+  height: clamp(1.8rem, 4vw, 2.6rem);
+  opacity: 0;
+  transform: scale(0.65);
+  content: "";
+}
+
+.mark::before {
+  top: 3%;
+  left: 0;
+  border-top: 2px solid rgba(0, 139, 68, 0.62);
+  border-left: 2px solid rgba(0, 139, 68, 0.62);
+  transform-origin: top left;
+  animation: corner-draw 620ms 180ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.mark::after {
+  right: 0;
+  bottom: 3%;
+  border-right: 2px solid rgba(252, 184, 19, 0.8);
+  border-bottom: 2px solid rgba(252, 184, 19, 0.8);
+  transform-origin: bottom right;
+  animation: corner-draw 620ms 260ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0.9rem 1.4rem rgba(6, 74, 43, 0.08));
+  animation: logo-reveal 860ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.track {
+  position: absolute;
+  right: 9%;
+  bottom: -0.8rem;
+  left: 9%;
+  height: 2px;
+  overflow: hidden;
+  background: rgba(6, 74, 43, 0.14);
+  opacity: 0;
+  animation: track-appear 220ms 300ms ease both;
+}
+
+.track span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--ember);
+  transform-origin: left center;
+  animation: track-fill 620ms 300ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@keyframes logo-reveal {
+  0% {
+    opacity: 0;
+    clip-path: inset(68% 0 0 0);
+    transform: translateY(1rem) scale(0.9);
+  }
+  60% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translateY(-0.2rem) scale(1.025);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes corner-draw {
+  from {
+    opacity: 0;
+    transform: scale(0.65);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes edge-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes track-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes track-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader,
+  .preloader::before,
+  .preloader::after,
+  .mark::before,
+  .mark::after,
+  .logo,
+  .track,
+  .track span {
+    animation: none;
+    transition-duration: 80ms;
+  }
+}
