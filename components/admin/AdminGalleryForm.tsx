@@ -9,7 +9,7 @@ export function AdminGalleryForm({ item }: { item?: GalleryItem }) {
         <span>Photo</span>
         <div>
           <h2>{item ? "Edit gallery photo" : "Add a gallery photo"}</h2>
-          <p>Upload a product, factory, packing or delivery image for the gallery page.</p>
+          <p>Upload a factory, packing, quality or delivery image for the gallery page.</p>
         </div>
       </div>
       <div className="admin-form__grid admin-form__grid--simple">
@@ -21,7 +21,6 @@ export function AdminGalleryForm({ item }: { item?: GalleryItem }) {
           Photo Type
           <select name="category" defaultValue={item?.category ?? "Gallery"}>
             <option value="Gallery">Gallery</option>
-            <option value="Product">Product</option>
             <option value="Manufacturing">Manufacturing</option>
             <option value="Quality">Quality</option>
             <option value="Packing">Packing</option>

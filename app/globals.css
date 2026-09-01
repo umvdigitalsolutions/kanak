@@ -7985,9 +7985,9 @@ label small {
 
 .delivery-final-container {
   position: absolute;
-  top: 29%;
+  top: clamp(12.5rem, 32svh, 18rem);
   left: 50%;
-  width: min(43rem, 50vw);
+  width: min(40rem, 48vw, 60svh);
   height: auto;
   max-width: none;
   opacity: var(--container-opacity);
@@ -8018,6 +8018,7 @@ label small {
 .delivery-3d-overlay--center {
   align-items: flex-end;
   justify-content: center;
+  padding-bottom: clamp(3.8rem, 7svh, 5.5rem);
   text-align: center;
 }
 
@@ -12875,28 +12876,47 @@ body:has(.admin-shell-root) main {
 }
 
 .filter-row--primary {
-  width: fit-content;
-  gap: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(100%, 43rem);
+  gap: 0.35rem;
   border: 1px solid rgba(6, 74, 43, 0.22);
-  border-radius: 4px;
-  padding: 3px;
+  border-radius: 6px;
+  padding: 0.35rem;
   background: #ffffff;
+  box-shadow: 0 0.65rem 1.6rem rgba(2, 43, 25, 0.06);
 }
 
 .filter-row--primary button {
-  min-width: 13rem;
-  border: 0;
-  border-radius: 2px;
+  display: inline-flex;
+  min-width: 0;
+  min-height: 3.35rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  color: var(--charcoal);
+  line-height: 1.15;
+  white-space: normal;
 }
 
-.filter-row--primary button:hover {
+.filter-row--primary button svg {
+  flex: 0 0 auto;
+}
+
+.filter-row--primary button:hover:not(.is-selected) {
+  border-color: rgba(6, 74, 43, 0.18);
   background: rgba(6, 74, 43, 0.06);
   transform: none;
 }
 
 .filter-row--primary button.is-selected {
-  background: var(--forest);
+  border-color: var(--charcoal);
+  background: var(--charcoal);
   color: #ffffff;
+  box-shadow: 0 0.45rem 1rem rgba(2, 43, 25, 0.16);
 }
 
 .product-category-overview__head,

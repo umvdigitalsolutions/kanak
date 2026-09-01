@@ -8,6 +8,7 @@ import {
   CookingPot,
   CupSoda,
   Grid3X3,
+  Leaf,
   Layers3,
   Package,
   Pizza,
@@ -39,6 +40,11 @@ const rangeIcons: Record<string, LucideIcon> = {
   "Paper Food Box With Compartment": Grid3X3,
   "Paper Meal Box": Package,
   "Food Tray": Rows3,
+};
+
+const filterMeta: Record<string, { icon: LucideIcon; label: string }> = {
+  "Plastic Containers": { icon: Package, label: "Plastic Containers" },
+  Biodegradables: { icon: Leaf, label: "Biodegradable Range" },
 };
 
 export function ProductFilter({
@@ -148,22 +154,29 @@ export function ProductFilter({
             : `Complete ${filter.toLowerCase()} ranges for bulk packaging enquiries.`}
         </p>
       </div>
-      <div className="filter-row filter-row--primary" aria-label="Product ranges">
-        {filters.map((item) => (
-          <button
-            aria-pressed={filter === item}
-            className={filter === item ? "is-selected" : ""}
-            key={item}
-            onClick={() => {
-              setFilter(item);
-              setProductRange(null);
-              setQuery("");
-            }}
-            type="button"
-          >
-            {item}
-          </button>
-        ))}
+      <div className="filter-row filter-row--primary" aria-label="Product range switcher">
+        {filters.map((item) => {
+          const meta = filterMeta[item] ?? { icon: Package, label: item };
+          const FilterIcon = meta.icon;
+
+          return (
+            <button
+              aria-label={`Show ${meta.label}`}
+              aria-pressed={filter === item}
+              className={filter === item ? "is-selected" : ""}
+              key={item}
+              onClick={() => {
+                setFilter(item);
+                setProductRange(null);
+                setQuery("");
+              }}
+              type="button"
+            >
+              <FilterIcon aria-hidden="true" size={19} strokeWidth={1.8} />
+              <span>{meta.label}</span>
+            </button>
+          );
+        })}
       </div>
       <div className="products-browser__content">
         {!productRange ? (

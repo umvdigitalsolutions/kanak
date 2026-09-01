@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { manufacturingGalleryItems } from "@/data/gallery";
 import { getManagedGalleryItems } from "@/lib/backend/gallery";
-import { getProducts } from "@/lib/backend/products";
 import { Container } from "@/components/ui/Container";
 
 export const revalidate = 300;
@@ -10,34 +9,28 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "Gallery",
   description:
-    "View Kanak Mouldings product and manufacturing visuals for food packaging containers, material preparation, forming, lid fit and packing.",
+    "View Kanak Mouldings manufacturing visuals for material preparation, container forming, lid-fit checks, quality review and packing.",
 };
 
 export default async function GalleryPage() {
-  const products = await getProducts();
-  const managedGalleryItems = await getManagedGalleryItems();
-  const galleryItems = [
-    ...products
-      .filter((product) => product.image)
-      .map((product) => ({
-        src: product.image as string,
-        title: product.name,
-        description: product.shortDescription,
-        category: "Product",
-      })),
-    ...manufacturingGalleryItems,
-    ...managedGalleryItems,
-  ];
+  const managedGalleryItems = (await getManagedGalleryItems()).filter(
+    (item) => item.category.trim().toLowerCase() !== "product",
+  );
+  const galleryItems = Array.from(
+    new Map(
+      [...manufacturingGalleryItems, ...managedGalleryItems].map((item) => [item.src, item]),
+    ).values(),
+  );
 
   return (
     <section className="page-shell gallery-page">
       <Container>
         <div className="page-hero">
           <p className="kicker">Gallery</p>
-          <h1>PRODUCT AND MANUFACTURING VISUALS.</h1>
+          <h1>MANUFACTURING AND QUALITY VISUALS.</h1>
           <p>
-            A focused view of container formats, material flow, lid-fit checks
-            and packing stages used to explain the product range.
+            A focused view of material preparation, forming, lid-fit checks,
+            quality review and dispatch-ready packing.
           </p>
         </div>
 

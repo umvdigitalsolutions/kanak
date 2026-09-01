@@ -43,7 +43,7 @@ export default async function AdminGalleryPage({ searchParams }: Props) {
     {
       label: "Photo Types",
       value: galleryTypes,
-      detail: "Product, factory, packing etc.",
+      detail: "Factory, quality, packing etc.",
       icon: LayoutGrid,
     },
   ];
@@ -55,7 +55,7 @@ export default async function AdminGalleryPage({ searchParams }: Props) {
           <div>
             <p className="kicker">Gallery</p>
             <h1>ADD WEBSITE PHOTOS.</h1>
-            <p>Upload product, factory, packaging or quality images for the gallery page.</p>
+            <p>Upload factory, packaging, quality or delivery images for the gallery page.</p>
           </div>
           <div className="admin-actions">
             <Link className="admin-secondary" href="/admin">
@@ -97,7 +97,7 @@ export default async function AdminGalleryPage({ searchParams }: Props) {
         <div className="admin-guidance-strip">
           <div>
             <p className="kicker">Gallery Helper</p>
-            <h2>Add only clear product, factory, packing and quality photos.</h2>
+            <h2>Add only clear factory, packing and quality photos.</h2>
             <p>
               Choose the photo type, upload one clean image and keep unfinished photos hidden until they look right on the public gallery.
             </p>

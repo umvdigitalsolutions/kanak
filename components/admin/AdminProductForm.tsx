@@ -90,7 +90,7 @@ export function AdminProductForm({ categories = [], product }: { categories?: Pr
         <span>Step 2</span>
         <div>
           <h2>Product photo</h2>
-          <p>Upload a clean product image. This will be used on product cards and gallery pages.</p>
+          <p>Upload a clean product image. This will be used on product cards and product detail pages.</p>
         </div>
       </div>
 
