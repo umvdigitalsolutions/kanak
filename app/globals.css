@@ -13603,11 +13603,17 @@ body:has(.admin-shell-root) main {
 
 .director-story {
   display: grid;
-  grid-template-columns: minmax(20rem, 0.78fr) minmax(0, 1.22fr);
-  align-items: start;
-  gap: 6rem;
+  grid-template-columns: minmax(17rem, 0.48fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 4.5rem;
   border-bottom: 1px solid var(--line);
   padding: 7rem 0;
+}
+
+.director-story__copy {
+  align-self: start;
+  position: sticky;
+  top: 7.25rem;
 }
 
 .director-portrait {
@@ -13648,12 +13654,12 @@ body:has(.admin-shell-root) main {
 
 .director-story__copy h2 {
   max-width: 12ch;
-  margin: 0.8rem 0 1.8rem;
-  font-size: 3.5rem;
+  margin: 0.8rem 0 1.55rem;
+  font-size: 3.15rem;
 }
 
 .director-story__copy > p:not(.kicker) {
-  max-width: 42rem;
+  max-width: 25rem;
   margin-top: 1rem;
 }
 
@@ -13663,6 +13669,186 @@ body:has(.admin-shell-root) main {
   border-left: 4px solid var(--ember);
   padding: 0.45rem 0 0.45rem 1.25rem;
   font-size: 1.25rem;
+}
+
+.director-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.director-card {
+  min-width: 0;
+  min-height: 42rem;
+  scroll-margin-top: 6.5rem;
+  perspective: 1200px;
+}
+
+.director-card__toggle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.director-card__surface {
+  position: relative;
+  display: block;
+  min-height: 42rem;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 720ms cubic-bezier(0.2, 0.72, 0.18, 1);
+}
+
+.director-card__toggle:checked + .director-card__surface {
+  transform: rotateY(180deg);
+}
+
+.director-card__toggle:focus-visible + .director-card__surface {
+  outline: 3px solid rgba(252, 184, 19, 0.85);
+  outline-offset: 0.35rem;
+}
+
+.director-card__face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf7;
+  backface-visibility: hidden;
+  box-shadow: 0 1.2rem 3.5rem rgba(1, 24, 14, 0.08);
+}
+
+.director-card__face--front {
+  justify-content: flex-end;
+}
+
+.director-card__face--back {
+  justify-content: flex-start;
+  gap: 0.82rem;
+  padding: 1.35rem;
+  background:
+    linear-gradient(145deg, rgba(252, 184, 19, 0.1), transparent 38%),
+    var(--soft-black);
+  color: var(--porcelain);
+  transform: rotateY(180deg);
+}
+
+.director-card__media {
+  position: absolute;
+  inset: 0;
+}
+
+.director-card__media::after {
+  position: absolute;
+  inset: 42% 0 0;
+  content: "";
+  background: linear-gradient(180deg, transparent, rgba(1, 24, 14, 0.9));
+}
+
+.director-card__media img {
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 720ms ease;
+}
+
+.director-card__surface:hover .director-card__media img {
+  transform: scale(1.035);
+}
+
+.director-card__identity {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 1rem;
+  padding: 1.2rem;
+  color: var(--porcelain);
+}
+
+.director-card__identity strong,
+.director-card__identity em,
+.director-card__back-head strong,
+.director-card__back-head em {
+  display: block;
+}
+
+.director-card__identity strong,
+.director-card__back-head strong {
+  font-size: 1.25rem;
+  font-weight: 850;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.director-card__identity em,
+.director-card__back-head em {
+  margin-top: 0.2rem;
+  color: var(--ember);
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.director-card__identity small,
+.director-card__back-head small {
+  border: 1px solid rgba(255, 253, 247, 0.34);
+  border-radius: 999px;
+  padding: 0.42rem 0.62rem;
+  color: rgba(255, 253, 247, 0.78);
+  font-size: 0.62rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.director-card__back-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 253, 247, 0.15);
+  padding-bottom: 1rem;
+}
+
+.director-card__intro {
+  display: block;
+  max-width: 16ch;
+  color: var(--porcelain);
+  font-size: 1.56rem;
+  font-weight: 850;
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+.director-card__bio {
+  display: block;
+  color: rgba(255, 253, 247, 0.72);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  text-transform: none;
+}
+
+.director-card__quote {
+  display: block;
+  margin-top: auto;
+  border-left: 3px solid var(--ember);
+  padding-left: 0.85rem;
+  color: var(--porcelain);
+  font-size: 0.84rem;
+  font-weight: 750;
+  line-height: 1.42;
+  text-transform: none;
 }
 
 .about-direction {
@@ -14045,6 +14231,10 @@ body:has(.admin-shell-root) main {
     padding: 5rem 0;
   }
 
+  .director-story__copy {
+    position: static;
+  }
+
   .director-portrait {
     position: static;
     width: min(100%, 34rem);
@@ -14052,6 +14242,27 @@ body:has(.admin-shell-root) main {
 
   .director-portrait__image {
     aspect-ratio: 4 / 5;
+  }
+
+  .director-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .director-card,
+  .director-card__surface {
+    min-height: 40rem;
+  }
+
+  .director-card__face--back {
+    padding: 1.2rem;
+  }
+
+  .director-card__intro {
+    font-size: 1.42rem;
+  }
+
+  .director-card__bio {
+    font-size: 0.76rem;
   }
 
   .about-direction article,
@@ -14160,6 +14371,50 @@ body:has(.admin-shell-root) main {
     font-size: 1.08rem;
   }
 
+  .director-cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .director-card,
+  .director-card__surface {
+    min-height: 37rem;
+  }
+
+  .director-card__identity,
+  .director-card__back-head {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .director-card__identity {
+    padding: 1rem;
+  }
+
+  .director-card__identity small,
+  .director-card__back-head small {
+    justify-self: start;
+  }
+
+  .director-card__face--back {
+    gap: 0.72rem;
+    padding: 1rem;
+  }
+
+  .director-card__intro {
+    max-width: 18ch;
+    font-size: 1.24rem;
+  }
+
+  .director-card__bio {
+    font-size: 0.72rem;
+    line-height: 1.48;
+  }
+
+  .director-card__quote {
+    font-size: 0.76rem;
+  }
+
   .about-direction article,
   .about-direction article + article {
     grid-template-columns: 1fr;
@@ -14238,6 +14493,15 @@ body:has(.admin-shell-root) main {
   .about-quality__content h2,
   .about-journey__head h2 {
     font-size: 2.15rem;
+  }
+
+  .director-card,
+  .director-card__surface {
+    min-height: 39rem;
+  }
+
+  .director-card__bio {
+    font-size: 0.68rem;
   }
 }
 
