@@ -7,6 +7,7 @@ import { categoryInputFromForm, deleteCategory, saveCategory } from "@/lib/backe
 import { isDatabaseConnectionError, logBackendError } from "@/lib/backend/errors";
 import { formBoolean, formString, splitLines, toSlug } from "@/lib/backend/form";
 import { deleteGalleryItem, saveGalleryItem } from "@/lib/backend/gallery";
+import { deleteGalleryImageBySrc } from "@/lib/backend/gallery-images";
 import { isInquiryStatus, updateInquiryStatus } from "@/lib/backend/inquiries";
 import { saveUploadedMediaFromForm, saveUploadedMediaListFromForm } from "@/lib/backend/media";
 import { deleteProduct, saveProduct, syncStaticProductsToMongo, type ProductInput } from "@/lib/backend/products";
@@ -141,21 +142,28 @@ export async function deleteProductAction(formData: FormData) {
 export async function saveGalleryItemAction(formData: FormData) {
   await requireAdmin();
   let target = "/admin/gallery?saved=1";
+  const newGalleryImage = formString(formData, "newGalleryImage");
 
   try {
-    const uploadedImage = await saveUploadedMediaFromForm(formData, "imageFile", "gallery");
     await saveGalleryItem({
       id: formString(formData, "id") || undefined,
       title: formString(formData, "title"),
       description: formString(formData, "description"),
       category: formString(formData, "category"),
-      src: uploadedImage || formString(formData, "src"),
+      src: formString(formData, "src"),
       order: Number(formString(formData, "order", "100")),
       isPublished: formBoolean(formData, "isPublished"),
     });
     revalidatePath("/gallery");
   } catch (error) {
     logBackendError("Admin gallery save failed", error);
+    if (newGalleryImage) {
+      try {
+        await deleteGalleryImageBySrc(newGalleryImage);
+      } catch (cleanupError) {
+        logBackendError("Unattached gallery image cleanup failed", cleanupError);
+      }
+    }
     target = adminErrorRedirect("/admin/gallery", error);
   }
 
