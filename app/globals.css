@@ -8600,6 +8600,17 @@ label small {
     margin-top: 1rem;
   }
 
+  .delivery-3d[data-scroll-story="active"] .delivery-foreground-handover {
+    top: min(var(--handover-y), calc(100svh - 4.75rem));
+    left: 60vw;
+    width: min(25rem, 88vw);
+    transition: opacity 220ms ease;
+  }
+
+  .delivery-3d[data-scroll-story="active"][data-delivery-beat="3"] .delivery-foreground-handover {
+    opacity: 0;
+  }
+
   .delivery-3d[data-scroll-story="active"][data-delivery-beat="3"] .delivery-3d-overlay {
     align-items: flex-end;
     padding: 0 1.25rem 3.35rem;
