@@ -3022,13 +3022,57 @@ button:hover .button-arrow {
 }
 
 .footer__bottom {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  justify-items: center;
   gap: 1rem;
   margin-top: 3rem;
   border-top: 1px solid var(--line-invert);
   padding-top: 1rem;
   font-size: 0.8rem;
+  text-align: center;
+}
+
+.footer__legal {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  text-align: left;
+}
+
+.footer__credit {
+  display: flex;
+  flex: none;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.28rem;
+  justify-self: center;
+  width: fit-content;
+  color: rgba(255, 253, 247, 0.58);
+  text-decoration: none;
+  transition:
+    color 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.footer__credit:hover {
+  color: var(--porcelain);
+  transform: translateY(-1px);
+}
+
+.footer__credit span {
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.footer__credit img {
+  width: 5.6rem;
+  height: auto;
+  opacity: 0.92;
 }
 
 .page-shell,
@@ -7049,9 +7093,20 @@ label small {
 
   .section-split,
   .page-cta,
-  .footer__bottom {
+  .footer__legal {
     align-items: start;
     flex-direction: column;
+  }
+
+  .footer__bottom {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .footer__credit {
+    align-items: center;
+    justify-self: center;
+    margin-top: 0.35rem;
   }
 
   .product-grid,
@@ -13700,8 +13755,9 @@ body:has(.admin-shell-root) main {
   display: block;
   min-height: 42rem;
   cursor: pointer;
+  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
-  transition: transform 720ms cubic-bezier(0.2, 0.72, 0.18, 1);
+  transition: transform 440ms cubic-bezier(0.32, 0.06, 0.16, 1);
 }
 
 .director-card__toggle:checked + .director-card__surface {
@@ -13723,6 +13779,7 @@ body:has(.admin-shell-root) main {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fffdf7;
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   box-shadow: 0 1.2rem 3.5rem rgba(1, 24, 14, 0.08);
 }
@@ -14134,6 +14191,819 @@ body:has(.admin-shell-root) main {
   margin-top: 0.7rem;
 }
 
+/* ============================================================
+   About page - premium pass
+   Layered over the base about rules above; the responsive
+   blocks that follow still override at small widths.
+   ============================================================ */
+
+.about-page {
+  --gold: #c8971a;
+  --gold-soft: rgba(252, 184, 19, 0.16);
+  --hairline: rgba(6, 74, 43, 0.14);
+}
+
+/* Kickers get a leading gold rule across the page. */
+.about-page .kicker,
+.about-page .about-range__content .kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+}
+
+.about-page .kicker::before {
+  width: 1.9rem;
+  height: 1px;
+  flex: none;
+  background: currentColor;
+  opacity: 0.75;
+  content: "";
+}
+
+/* ---- Hero ---- */
+
+.about-hero {
+  border-radius: 0;
+}
+
+.about-hero__shade {
+  background:
+    linear-gradient(180deg, rgba(1, 18, 11, 0.82) 0%, rgba(1, 18, 11, 0.42) 42%, rgba(1, 18, 11, 0.88) 100%),
+    radial-gradient(80% 60% at 12% 30%, rgba(1, 18, 11, 0.7), transparent 70%);
+}
+
+.about-hero__copy h1 {
+  font-size: clamp(3rem, 7vw, 6.4rem);
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+}
+
+.about-hero__statement {
+  margin-top: 1.1rem;
+  color: var(--ember);
+  font-size: clamp(1.05rem, 1.9vw, 1.5rem);
+  font-weight: 750;
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+.about-hero__lead {
+  max-width: 40ch;
+  color: rgba(255, 253, 247, 0.82);
+  font-size: clamp(0.98rem, 1.3vw, 1.12rem);
+  line-height: 1.65;
+}
+
+.about-hero__facts {
+  border-top: 1px solid rgba(255, 253, 247, 0.16);
+  padding-top: 1.6rem;
+  gap: 0;
+}
+
+.about-hero__facts > div {
+  position: relative;
+  padding: 0 clamp(1rem, 2.4vw, 2.2rem);
+}
+
+.about-hero__facts > div:first-child {
+  padding-left: 0;
+}
+
+.about-hero__facts > div + div::before {
+  position: absolute;
+  top: 0.1rem;
+  bottom: 0.1rem;
+  left: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(252, 184, 19, 0.55), transparent);
+  content: "";
+}
+
+.about-hero__facts strong {
+  display: block;
+  color: var(--porcelain);
+  font-size: clamp(1.15rem, 2vw, 1.65rem);
+  font-weight: 850;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.about-hero__facts span {
+  display: block;
+  margin-top: 0.45rem;
+  color: rgba(255, 253, 247, 0.6);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ---- Story ---- */
+
+.about-story h2 {
+  font-size: clamp(2.2rem, 4.4vw, 3.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+
+.about-story__intro {
+  max-width: 38ch;
+  margin-top: 1.3rem;
+  color: var(--charcoal);
+  font-size: clamp(1rem, 1.5vw, 1.18rem);
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.about-story__body p {
+  color: var(--text-grey);
+  font-size: 0.97rem;
+  line-height: 1.75;
+}
+
+.about-principles > div {
+  position: relative;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--hairline);
+}
+
+.about-principles > div::after {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 2.6rem;
+  height: 1px;
+  background: var(--ember);
+  content: "";
+}
+
+.about-principles svg {
+  color: var(--sage);
+}
+
+.about-principles strong {
+  letter-spacing: -0.01em;
+}
+
+/* ---- Director cards ---- */
+
+.director-story {
+  padding-block: clamp(4rem, 8vw, 7rem);
+}
+
+.director-story__copy h2 {
+  font-size: clamp(2.1rem, 4vw, 3.3rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+
+.director-cards {
+  gap: clamp(1rem, 2vw, 1.6rem);
+  padding: 0.35rem;
+  margin: -0.35rem;
+}
+
+.director-card {
+  min-height: clamp(32rem, 50vw, 46rem);
+}
+
+.director-card__surface {
+  min-height: clamp(32rem, 50vw, 46rem);
+}
+
+.director-card__face {
+  border: 0;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 1px rgba(6, 74, 43, 0.13),
+    0 1.4rem 3rem rgba(1, 24, 14, 0.13);
+  transition:
+    box-shadow 420ms ease,
+    transform 420ms ease;
+}
+
+.director-card__surface:hover .director-card__face--front {
+  box-shadow:
+    0 0 0 1px rgba(6, 74, 43, 0.2),
+    0 2rem 4rem rgba(1, 24, 14, 0.19);
+}
+
+/* Deeper, longer scrim so the name always sits on darkness. */
+.director-card__media::after {
+  inset: 52% 0 0;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(2, 24, 15, 0.18) 46%,
+    rgba(2, 24, 15, 0.72) 78%,
+    rgba(2, 24, 15, 0.94)
+  );
+}
+
+.director-card__media img {
+  transition: transform 900ms cubic-bezier(0.2, 0.72, 0.18, 1);
+}
+
+.director-card__surface:hover .director-card__media img {
+  transform: scale(1.05);
+}
+
+.director-card__identity {
+  align-items: center;
+  padding: 1.5rem 1.6rem 1.7rem;
+}
+
+.director-card__identity::before {
+  position: absolute;
+  top: 0;
+  left: 1.6rem;
+  width: 2.8rem;
+  height: 2px;
+  background: var(--ember);
+  content: "";
+}
+
+.director-card__identity strong {
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
+  letter-spacing: -0.015em;
+}
+
+.director-card__identity em {
+  margin-top: 0.4rem;
+  color: var(--ember);
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* "Tap to read" becomes a circular affordance. */
+.director-card__identity small {
+  display: grid;
+  width: 2.9rem;
+  height: 2.9rem;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 253, 247, 0.45);
+  border-radius: 50%;
+  color: transparent;
+  font-size: 0;
+  transition:
+    background 300ms ease,
+    border-color 300ms ease,
+    transform 300ms ease;
+}
+
+.director-card__identity small::after {
+  color: var(--porcelain);
+  font-size: 1.05rem;
+  line-height: 1;
+  content: "\2192";
+}
+
+.director-card__surface:hover .director-card__identity small {
+  border-color: var(--ember);
+  background: var(--ember);
+  transform: translateX(3px);
+}
+
+.director-card__surface:hover .director-card__identity small::after {
+  color: var(--soft-black);
+}
+
+/* ---- Card back ---- */
+
+.director-card__face--back {
+  gap: 0;
+  padding: clamp(1.4rem, 2.4vw, 2rem);
+  background:
+    radial-gradient(120% 70% at 100% 0%, rgba(252, 184, 19, 0.16), transparent 58%),
+    linear-gradient(165deg, #06301c, #021a10 62%);
+}
+
+.director-card__back-head {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(252, 184, 19, 0.32);
+}
+
+.director-card__back-head strong {
+  font-size: clamp(1.15rem, 1.7vw, 1.45rem);
+  letter-spacing: -0.015em;
+}
+
+.director-card__back-head em {
+  margin-top: 0.35rem;
+  color: var(--ember);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.director-card__back-head small {
+  color: rgba(255, 253, 247, 0.5);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.director-card__intro {
+  display: block;
+  margin-top: 0.95rem;
+  color: var(--porcelain);
+  font-size: clamp(0.95rem, 1.25vw, 1.08rem);
+  font-weight: 750;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.director-card__bio {
+  display: block;
+  margin-top: 0.7rem;
+  color: rgba(255, 253, 247, 0.72);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.director-card__quote {
+  position: relative;
+  display: block;
+  margin-top: 1.1rem;
+  padding: 0 0 0 1.05rem;
+  color: var(--porcelain);
+  font-size: 0.86rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+/* Bios vary in length, so the back face scrolls rather than clipping. */
+.director-card__face--back {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(252, 184, 19, 0.5) transparent;
+}
+
+.director-card__face--back::-webkit-scrollbar {
+  width: 4px;
+}
+
+.director-card__face--back::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: rgba(252, 184, 19, 0.5);
+}
+
+.director-card__quote::before {
+  position: absolute;
+  top: 0.1rem;
+  bottom: 0.1rem;
+  left: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--ember), rgba(252, 184, 19, 0.15));
+  content: "";
+}
+
+/* ---- Vision / mission ---- */
+
+.about-direction {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(70% 90% at 82% 0%, rgba(252, 184, 19, 0.16), transparent 62%),
+    linear-gradient(160deg, #06301c 0%, #02180e 68%);
+}
+
+.about-direction::before {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(252, 184, 19, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(252, 184, 19, 0.05) 1px, transparent 1px);
+  background-size: 70px 70px;
+  mask-image: radial-gradient(90% 80% at 50% 40%, #000, transparent 78%);
+  content: "";
+  pointer-events: none;
+}
+
+.about-direction__grid {
+  position: relative;
+  padding-block: clamp(4.5rem, 9vw, 8rem);
+}
+
+.about-direction svg {
+  color: var(--ember);
+}
+
+.about-direction h2 {
+  font-size: clamp(1.6rem, 2.7vw, 2.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+
+.about-direction article > p:not(.kicker) {
+  color: rgba(255, 253, 247, 0.72);
+  line-height: 1.75;
+}
+
+.about-direction article + article {
+  border-color: rgba(252, 184, 19, 0.24);
+}
+
+/* ---- Range + quality media ---- */
+
+.about-range__media,
+.about-quality__media {
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 1px rgba(6, 74, 43, 0.1),
+    0 1.6rem 4rem rgba(1, 24, 14, 0.14);
+}
+
+.about-range__media figcaption,
+.about-quality__media figcaption {
+  letter-spacing: 0.14em;
+}
+
+.about-range__content h2,
+.about-quality__content h2 {
+  font-size: clamp(2.1rem, 4vw, 3.3rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+
+.about-range__list li {
+  border-top: 1px solid var(--hairline);
+  padding-top: 1.15rem;
+}
+
+.about-range__list li > span {
+  color: var(--gold);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.about-range__list h3 {
+  letter-spacing: -0.015em;
+}
+
+.about-quality__list article {
+  border-top: 1px solid var(--hairline);
+  padding-top: 1rem;
+}
+
+.about-quality__list svg {
+  color: var(--sage);
+}
+
+/* ---- Journey timeline ---- */
+
+.about-journey__head h2 {
+  font-size: clamp(2.1rem, 4vw, 3.3rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+
+.about-journey ol {
+  position: relative;
+}
+
+.about-journey ol::before {
+  position: absolute;
+  top: 0.62rem;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--ember), rgba(252, 184, 19, 0.15));
+  content: "";
+}
+
+.about-journey li {
+  position: relative;
+  border-top: 0;
+  padding-top: 2.2rem;
+}
+
+.about-journey li::before {
+  position: absolute;
+  top: 0.25rem;
+  left: 0;
+  width: 0.78rem;
+  height: 0.78rem;
+  border: 2px solid var(--ember);
+  border-radius: 50%;
+  background: var(--porcelain);
+  content: "";
+}
+
+.about-journey li > span {
+  color: var(--gold);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+}
+
+.about-journey h3 {
+  margin-top: 0.35rem;
+  letter-spacing: -0.015em;
+}
+
+/* ---- Closing CTA ---- */
+
+.about-page__cta {
+  position: relative;
+  overflow: hidden;
+  border: 0;
+  border-radius: 16px;
+  padding: clamp(2rem, 4vw, 3.4rem);
+  background:
+    radial-gradient(80% 120% at 88% 10%, rgba(252, 184, 19, 0.18), transparent 60%),
+    linear-gradient(150deg, #06301c, #02180e);
+  color: var(--porcelain);
+  box-shadow: 0 1.8rem 4.5rem rgba(1, 24, 14, 0.2);
+}
+
+.about-page__cta h2 {
+  color: var(--porcelain);
+  font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.about-page__cta div > p:last-child {
+  color: rgba(255, 253, 247, 0.72);
+}
+
+/* ------------------------------------------------------------
+   Director layout - evenly aligned, generously spaced.
+   ------------------------------------------------------------ */
+
+.director-story {
+  grid-template-columns: minmax(16rem, 0.62fr) minmax(0, 1.38fr);
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.director-cards {
+  gap: clamp(1.75rem, 4vw, 3rem);
+  align-items: stretch;
+}
+
+/* ------------------------------------------------------------
+   Safari hardening for the flip.
+
+   WebKit flattens a preserve-3d subtree for several ordinary
+   reasons, and once flattened `backface-visibility: hidden` stops
+   hiding anything - the rotated back face shows through the front,
+   so its text reads mirrored and its dark panel washes the card.
+   Rather than trusting backface-visibility, each face is also
+   switched with opacity at the midpoint of the 440ms rotation, so
+   exactly one face is ever painted whether or not 3D survives.
+   ------------------------------------------------------------ */
+
+.director-card__face--front,
+.director-card__face--back {
+  transition:
+    opacity 0s linear 220ms,
+    box-shadow 420ms ease;
+}
+
+.director-card__face--front {
+  opacity: 1;
+}
+
+.director-card__face--back {
+  opacity: 0;
+}
+
+.director-card__toggle:checked + .director-card__surface .director-card__face--front {
+  opacity: 0;
+}
+
+.director-card__toggle:checked + .director-card__surface .director-card__face--back {
+  opacity: 1;
+}
+
+/* Nudge the faces apart on the Z axis so a flattened scene still
+   resolves their paint order predictably. */
+.director-card__face--front {
+  transform: translateZ(1px);
+}
+
+.director-card__face--back {
+  transform: rotateY(180deg) translateZ(1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .director-card__face--front,
+  .director-card__face--back {
+    transition: opacity 0s;
+  }
+}
+
+/* ============================================================
+   Director cards - cinematic treatment
+   Layer stack on the front face, back to front:
+     portrait (slow push-in) > colour grade + vignette >
+     bottom scrim > film grain > light sweep > titles
+   ============================================================ */
+
+/* Portrait: a slow push-in and drift, like a locked-off camera move.
+   This owns `transform`, so hover reads through filter instead. */
+.director-card__media img {
+  transform-origin: 58% 32%;
+  animation: director-push-in 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes director-push-in {
+  from {
+    transform: scale(1.015) translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: scale(1.035) translate3d(-0.5%, -0.7%, 0);
+  }
+}
+
+.director-card__media::before {
+  transition: opacity 620ms ease;
+}
+
+.director-card__surface:hover .director-card__media::before {
+  opacity: 0.85;
+}
+
+.director-card__surface {
+  transition:
+    transform 440ms cubic-bezier(0.32, 0.06, 0.16, 1),
+    translate 420ms cubic-bezier(0.2, 0.72, 0.18, 1);
+}
+
+.director-card:hover .director-card__surface,
+.director-card:focus-within .director-card__surface {
+  translate: 0 -6px;
+}
+
+/* Grade: cool green in the shadows, warm lift at the top, plus a vignette
+   so the frame falls off at the corners the way a fast lens does. */
+.director-card__media::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(125% 88% at 50% 32%, transparent 55%, rgba(1, 16, 10, 0.3) 100%),
+    linear-gradient(0deg, rgba(4, 42, 27, 0.14), transparent 48%);
+  content: "";
+  pointer-events: none;
+}
+
+.director-card__media::after {
+  z-index: 2;
+}
+
+/* Film grain. The step animation jitters the plate so it reads as moving
+   emulsion rather than a static texture. */
+.director-card__face--front::before {
+  position: absolute;
+  inset: -12%;
+  z-index: 3;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  animation: director-grain 1400ms steps(1) infinite;
+  content: "";
+  pointer-events: none;
+}
+
+@keyframes director-grain {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-3%, 2%, 0); }
+  40% { transform: translate3d(2%, -3%, 0); }
+  60% { transform: translate3d(-2%, -2%, 0); }
+  80% { transform: translate3d(3%, 1%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* Anamorphic sweep - a soft highlight rakes across on hover. */
+.director-card__face--front::after {
+  position: absolute;
+  top: -30%;
+  bottom: -30%;
+  left: -40%;
+  z-index: 4;
+  width: 32%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 253, 247, 0.02) 22%,
+    rgba(255, 253, 247, 0.06) 38%,
+    rgba(252, 184, 19, 0.14) 50%,
+    rgba(255, 253, 247, 0.06) 62%,
+    rgba(255, 253, 247, 0.02) 78%,
+    transparent 100%
+  );
+  opacity: 0;
+  transform: rotate(14deg) translate3d(0, 0, 0);
+  content: "";
+  pointer-events: none;
+}
+
+.director-card__face--front::after {
+  display: none;
+}
+
+@keyframes director-sweep {
+  0% {
+    opacity: 0;
+    transform: rotate(14deg) translate3d(0, 0, 0);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  82% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotate(14deg) translate3d(430%, 0, 0);
+  }
+}
+
+/* Titles sit above every overlay and lift slightly as the sweep passes. */
+.director-card__identity {
+  z-index: 5;
+  transition: transform 620ms cubic-bezier(0.2, 0.72, 0.18, 1);
+}
+
+.director-card__surface:hover .director-card__identity {
+  transform: none;
+}
+
+.director-card__identity::before {
+  transition: width 620ms cubic-bezier(0.2, 0.72, 0.18, 1);
+}
+
+.director-card__surface:hover .director-card__identity::before {
+  width: 4.6rem;
+}
+
+/* Cards rise into frame as they enter the viewport, where the browser
+   supports scroll-driven animation. No JS, and it degrades to static. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .director-card {
+      animation: director-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 6% cover 26%;
+    }
+
+    .director-card:nth-child(2) {
+      animation-range: entry 2% cover 30%;
+    }
+  }
+}
+
+@keyframes director-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(2.6rem) scale(0.972);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (pointer: coarse) {
+  .director-card__face--front::before {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .director-card__media img,
+  .director-card__face--front::before {
+    animation: none;
+  }
+
+  .director-card__surface:hover .director-card__face--front::after {
+    animation: none;
+  }
+
+  .director-card__surface:hover .director-card__identity {
+    transform: none;
+  }
+}
+
 @media (max-width: 1100px) {
   .about-hero__copy h1 {
     font-size: 4.4rem;
@@ -14381,17 +15251,22 @@ body:has(.admin-shell-root) main {
     min-height: 37rem;
   }
 
-  .director-card__identity,
   .director-card__back-head {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
 
   .director-card__identity {
-    padding: 1rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.2rem 1.4rem;
   }
 
-  .director-card__identity small,
+  .director-card__identity::before {
+    left: 1.2rem;
+  }
+
   .director-card__back-head small {
     justify-self: start;
   }
@@ -14402,8 +15277,8 @@ body:has(.admin-shell-root) main {
   }
 
   .director-card__intro {
-    max-width: 18ch;
-    font-size: 1.24rem;
+    max-width: 24ch;
+    font-size: 1.05rem;
   }
 
   .director-card__bio {
@@ -14502,6 +15377,302 @@ body:has(.admin-shell-root) main {
 
   .director-card__bio {
     font-size: 0.68rem;
+  }
+}
+
+/* About page refinement: presentation-only overrides. */
+.about-page {
+  background:
+    linear-gradient(180deg, rgba(6, 74, 43, 0.035), transparent 34rem),
+    var(--porcelain);
+}
+
+.about-page .kicker,
+.about-page .about-range__content .kicker,
+.about-hero__copy h1,
+.about-hero__statement,
+.about-story h2,
+.director-story__copy h2,
+.about-direction h2,
+.about-range__content h2,
+.about-quality__content h2,
+.about-journey__head h2,
+.about-page__cta h2 {
+  letter-spacing: 0;
+}
+
+.about-hero {
+  height: 41rem;
+  min-height: 41rem;
+}
+
+.about-hero__content {
+  padding-top: 2.35rem;
+}
+
+.about-hero__copy {
+  max-width: 39rem;
+}
+
+.about-hero__copy h1 {
+  max-width: 11ch;
+  font-size: 5.35rem;
+}
+
+.about-hero__statement {
+  font-size: 1.28rem;
+}
+
+.about-hero__lead {
+  max-width: 37rem;
+  font-size: 1.02rem;
+}
+
+.about-story {
+  position: relative;
+  grid-template-columns: minmax(18rem, 0.84fr) minmax(20rem, 0.76fr) minmax(17rem, 0.58fr);
+  gap: clamp(2.75rem, 4.6vw, 5.25rem);
+  padding: 6.25rem 0;
+}
+
+.about-story::before {
+  position: absolute;
+  top: 4rem;
+  bottom: 4rem;
+  left: 37.5%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(6, 74, 43, 0.16), transparent);
+  content: "";
+  pointer-events: none;
+}
+
+.about-story__heading {
+  align-self: start;
+  padding-top: 0.2rem;
+}
+
+.about-story h2 {
+  max-width: 10.6ch;
+  font-size: 3.35rem;
+  line-height: 0.98;
+}
+
+.about-story__intro {
+  max-width: 35rem;
+  margin-top: 1.45rem;
+  font-size: 1.06rem;
+  line-height: 1.66;
+}
+
+.about-story__body {
+  gap: 1.35rem;
+  padding-top: 3.15rem;
+}
+
+.about-story__body p {
+  max-width: 31rem;
+  font-size: 0.96rem;
+  line-height: 1.76;
+}
+
+.about-principles {
+  align-self: center;
+  border-top: 1px solid rgba(6, 74, 43, 0.22);
+  border-bottom: 1px solid rgba(6, 74, 43, 0.12);
+}
+
+.about-principles > div {
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: 0.95rem;
+  padding: 1.35rem 0;
+}
+
+.about-principles strong {
+  font-size: 0.88rem;
+}
+
+.about-principles small {
+  max-width: 18rem;
+  line-height: 1.58;
+}
+
+.director-story {
+  padding: 6.25rem 0;
+}
+
+.director-card:hover .director-card__surface,
+.director-card:focus-within .director-card__surface {
+  translate: 0 -3px;
+}
+
+.director-card__media img {
+  animation: none;
+}
+
+.director-card__face--front::before {
+  animation: none;
+  opacity: 0.018;
+}
+
+.director-card__face--front::after {
+  display: none;
+}
+
+.about-range__media,
+.about-quality__media {
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 1px rgba(6, 74, 43, 0.12),
+    0 1.1rem 2.8rem rgba(1, 24, 14, 0.12);
+}
+
+.about-range__media {
+  position: relative;
+  top: auto;
+}
+
+.about-range,
+.about-quality {
+  padding: 6.25rem 0;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .about-story__heading,
+    .about-story__body,
+    .about-principles {
+      animation: about-section-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 24%;
+    }
+  }
+}
+
+@keyframes about-section-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.1rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1100px) {
+  .about-hero__copy h1 {
+    font-size: 4.55rem;
+  }
+
+  .about-story {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+    gap: 3rem 4rem;
+  }
+
+  .about-story::before {
+    display: none;
+  }
+
+  .about-story__body {
+    padding-top: 2.35rem;
+  }
+
+  .about-principles {
+    grid-column: 1 / -1;
+    align-self: stretch;
+  }
+}
+
+@media (max-width: 820px) {
+  .about-hero {
+    height: 36rem;
+    min-height: 36rem;
+  }
+
+  .about-story,
+  .director-story,
+  .about-range,
+  .about-quality {
+    padding: 4.65rem 0;
+  }
+
+  .about-story {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .about-story__body {
+    padding-top: 0;
+  }
+
+  .about-principles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 0.65rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .about-hero {
+    height: 34rem;
+    min-height: 34rem;
+  }
+
+  .about-hero__copy h1 {
+    font-size: 2.85rem;
+  }
+
+  .about-hero__statement {
+    font-size: 1rem;
+  }
+
+  .about-story,
+  .director-story,
+  .about-range,
+  .about-quality {
+    padding: 3.85rem 0;
+  }
+
+  .about-story h2,
+  .director-story__copy h2,
+  .about-range__content h2,
+  .about-quality__content h2,
+  .about-journey__head h2 {
+    font-size: 2.28rem;
+  }
+
+  .about-story__intro {
+    margin-top: 1.05rem;
+    font-size: 0.98rem;
+    line-height: 1.62;
+  }
+
+  .about-story__body p {
+    font-size: 0.93rem;
+    line-height: 1.68;
+  }
+
+  .about-principles {
+    grid-template-columns: 1fr;
+    margin-top: 0.2rem;
+  }
+
+  .about-principles > div {
+    padding: 1.05rem 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .about-hero__copy h1 {
+    font-size: 2.5rem;
+  }
+
+  .about-story h2,
+  .director-story__copy h2,
+  .about-range__content h2,
+  .about-quality__content h2,
+  .about-journey__head h2 {
+    font-size: 2rem;
   }
 }
 
