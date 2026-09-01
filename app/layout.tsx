@@ -6,7 +6,9 @@ import { assetPath } from "@/lib/assets";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { ScrollProgress } from "@/components/animation/ScrollProgress";
+import { SitePreloader } from "@/components/animation/SitePreloader";
 import { SmoothScroll } from "@/components/animation/SmoothScroll";
+import { TawkToChat } from "@/components/integrations/TawkToChat";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -49,11 +51,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html className={`${manrope.variable} ${geistMono.variable}`} lang="en-IN">
       <body>
+        <SitePreloader />
         <SmoothScroll />
         <ScrollProgress />
         <Header />
         <main>{children}</main>
         <Footer />
+        <TawkToChat
+          propertyId={process.env.TAWK_TO_PROPERTY_ID}
+          widgetId={process.env.TAWK_TO_WIDGET_ID}
+        />
         <script
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
           suppressHydrationWarning

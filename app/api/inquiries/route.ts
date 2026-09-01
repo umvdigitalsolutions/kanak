@@ -1,6 +1,7 @@
 import { isAdminAuthenticated } from "@/lib/admin/auth";
 import { databaseAwareMessage, databaseAwareStatus, logBackendError } from "@/lib/backend/errors";
 import { createInquiry, getInquiries } from "@/lib/backend/inquiries";
+import { sendInquiryNotification } from "@/lib/email/inquiry-notification";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,7 +32,20 @@ export async function POST(request: Request) {
       return jsonError("Please check the highlighted fields.", 422, errors);
     }
 
-    return Response.json({ ok: true, inquiry }, { status: 201 });
+    let notificationSent = false;
+
+    try {
+      const notification = await sendInquiryNotification(inquiry);
+      notificationSent = notification.sent;
+
+      if (!notification.sent) {
+        console.warn("Inquiry email notification skipped: Resend is not configured.");
+      }
+    } catch (error) {
+      logBackendError("Inquiry email notification failed", error);
+    }
+
+    return Response.json({ ok: true, inquiry, notificationSent }, { status: 201 });
   } catch (error) {
     logBackendError("Inquiry API submit failed", error);
     return jsonError(databaseAwareMessage(error, "Could not submit inquiry."), databaseAwareStatus(error, 500));
