@@ -36,7 +36,7 @@ export function TawkToChat({
   useEffect(() => {
     if (isAdminRoute) {
       window.Tawk_API?.hideWidget?.();
-    } else {
+    } else if (!document.documentElement.classList.contains("site-is-loading")) {
       window.Tawk_API?.showWidget?.();
     }
   }, [isAdminRoute]);
@@ -52,6 +52,19 @@ export function TawkToChat({
       {`
         window.Tawk_API = window.Tawk_API || {};
         window.Tawk_LoadStart = new Date();
+        window.Tawk_API.onBeforeLoad = function () {
+          window.Tawk_API.hideWidget();
+        };
+        window.Tawk_API.onLoad = function () {
+          if (!document.documentElement.classList.contains("site-is-loading")) {
+            window.Tawk_API.showWidget();
+          }
+        };
+        window.addEventListener("kanak:preloader-complete", function () {
+          if (typeof window.Tawk_API.showWidget === "function") {
+            window.Tawk_API.showWidget();
+          }
+        }, { once: true });
         (function () {
           var script = document.createElement("script");
           var firstScript = document.getElementsByTagName("script")[0];
